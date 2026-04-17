@@ -1,0 +1,41 @@
+{
+  "name": "em-rsr",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "generate:types": "payload generate:types",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@payloadcms/db-postgres": "^3.33.0",
+    "@payloadcms/next": "^3.33.0",
+    "@payloadcms/richtext-lexical": "^3.33.0",
+    "@payloadcms/translations": "^3.33.0",
+    "@payloadcms/ui": "^3.33.0",
+    "bcryptjs": "^2.4.3",
+    "framer-motion": "^12.0.0",
+    "graphql": "^16.9.0",
+    "next": "^15.3.0",
+    "nodemailer": "^6.9.16",
+    "payload": "^3.33.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "sharp": "^0.33.5",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.15.0",
+    "@types/nodemailer": "^6.4.17",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "playwright": "^1.52.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.8.0"
+  }
+}
