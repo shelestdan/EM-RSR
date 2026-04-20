@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation'
 const navLinks = [
   { href: '/uslugi', label: 'Услуги', code: '01' },
   { href: '/proekty', label: 'Проекты', code: '02' },
-  { href: '/karta-obektov', label: 'Карта', code: '03' },
+  { href: '/karta-obektov', label: 'География и объекты', code: '03' },
   { href: '/o-kompanii', label: 'О компании', code: '04' },
   { href: '/kontakty', label: 'Контакты', code: '05' },
 ]
@@ -43,7 +43,14 @@ export default function Header() {
     opacity: 0,
   })
   const [hoveredHref, setHoveredHref] = useState<string | null>(null)
+  const [brandFlip, setBrandFlip] = useState(false)
   const currentPath = normalizeNavPath(pathname)
+
+  // Logo text swap RU ⇄ EN every 4s
+  useEffect(() => {
+    const id = setInterval(() => setBrandFlip((v) => !v), 4000)
+    return () => clearInterval(id)
+  }, [])
 
   // Scroll handler — scrolled state + progress bar
   useEffect(() => {
@@ -216,10 +223,8 @@ export default function Header() {
             aria-label="ЕМ-ПСП — главная"
           >
             <span
-              className={`relative grid shrink-0 place-items-center border bg-white transition-all duration-500 ease-out group-hover:border-[#8ab0a3] ${
-                scrolled
-                  ? 'h-10 w-10 border-white/22 shadow-[0_6px_20px_rgba(0,0,0,0.3)]'
-                  : 'h-[50px] w-[50px] border-white/32 shadow-[0_10px_32px_rgba(0,0,0,0.3)]'
+              className={`relative grid shrink-0 place-items-center transition-all duration-500 ease-out ${
+                scrolled ? 'h-10 w-10' : 'h-[50px] w-[50px]'
               }`}
             >
               {/* Pulse ring on hover */}
@@ -228,32 +233,59 @@ export default function Header() {
                 className="pointer-events-none absolute inset-0 border border-[#5f8b7d]/0 transition-all duration-500 group-hover:inset-[-4px] group-hover:border-[#5f8b7d]/60"
               />
               <Image
-                src="/brand/logo-icon.png"
+                src="/brand/logo-icon-white.svg"
                 alt=""
-                width={36}
-                height={36}
+                width={40}
+                height={40}
                 priority
                 className={`object-contain transition-all duration-500 ${
-                  scrolled ? 'h-7 w-7' : 'h-9 w-9'
+                  scrolled ? 'h-9 w-9' : 'h-11 w-11'
                 }`}
               />
             </span>
-            <span className="flex flex-col">
+            <span className="flex flex-col overflow-hidden">
               <span
-                className={`font-brand font-black leading-none text-white transition-all duration-500 ease-out tracking-[-0.01em] ${
-                  scrolled ? 'text-[17px]' : 'text-[20px]'
+                className={`relative font-brand font-black leading-none text-white transition-all duration-500 ease-out tracking-[-0.01em] ${
+                  scrolled ? 'text-[17px] h-[17px]' : 'text-[20px] h-[20px]'
                 }`}
+                style={{ width: scrolled ? 80 : 96 }}
               >
-                ЕМ-ПСП
+                <span
+                  className={`absolute inset-0 transition-all duration-500 ease-out ${
+                    brandFlip ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
+                  }`}
+                >
+                  ЕМ-ПСП
+                </span>
+                <span
+                  className={`absolute inset-0 transition-all duration-500 ease-out ${
+                    brandFlip ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+                  }`}
+                >
+                  EM-PCP
+                </span>
               </span>
               <span
-                className={`hidden whitespace-nowrap font-bold uppercase text-[#8ab0a3]/72 transition-all duration-500 ease-out sm:block lg:hidden xl:block ${
+                className={`relative hidden whitespace-nowrap font-bold uppercase text-[#8ab0a3]/72 transition-all duration-500 ease-out sm:block lg:hidden xl:block ${
                   scrolled
-                    ? 'mt-0.5 text-[8px] tracking-[0.26em]'
-                    : 'mt-1.5 text-[9px] tracking-[0.28em]'
+                    ? 'mt-0.5 text-[8px] tracking-[0.26em] h-[9px]'
+                    : 'mt-1.5 text-[9px] tracking-[0.28em] h-[10px]'
                 }`}
               >
-                Engineering · Project · Construction
+                <span
+                  className={`absolute inset-0 transition-all duration-500 ease-out ${
+                    brandFlip ? 'opacity-0 -translate-y-1' : 'opacity-100 translate-y-0'
+                  }`}
+                >
+                  Инженерные · Проекты · Строительство
+                </span>
+                <span
+                  className={`absolute inset-0 transition-all duration-500 ease-out ${
+                    brandFlip ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
+                  }`}
+                >
+                  Engineering · Project · Construction
+                </span>
               </span>
             </span>
           </Link>
@@ -323,12 +355,12 @@ export default function Header() {
                 </span>
               </span>
               <span className="mt-0.5 block whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.18em] text-white/40 transition-colors group-hover:text-white/60">
-                Краснодар · СПб
+                Санкт-Петербург · Краснодар
               </span>
             </a>
 
             <Link
-              href="/#contact"
+              href="/portal"
               className={`group relative hidden overflow-hidden border border-[#3E5854] bg-[#3E5854] text-white transition-all duration-500 ease-out sm:inline-flex sm:items-center sm:gap-2 ${
                 scrolled
                   ? 'px-5 py-2.5 text-[10px]'
@@ -341,7 +373,7 @@ export default function Header() {
                 className="pointer-events-none absolute inset-y-0 -left-[40%] w-[40%] -skew-x-[20deg] bg-gradient-to-r from-transparent via-white/22 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[340%]"
               />
               <span className="relative z-10 font-black uppercase tracking-[0.14em]">
-                Обсудить проект
+                Портал исполнителей
               </span>
               <svg
                 className="relative z-10 transition-transform duration-300 group-hover:translate-x-0.5"
@@ -405,8 +437,6 @@ export default function Header() {
         }`}
       >
         <div className="relative border-t border-white/8 bg-[#07090f]">
-          {/* Decorative grid */}
-          <div className="pointer-events-none absolute inset-0 eng-grid-overlay opacity-[0.1]" aria-hidden="true" />
 
           <div className="relative px-5 pb-8 pt-6 sm:px-6">
             {/* Label */}
@@ -471,14 +501,14 @@ export default function Header() {
               }}
             >
               <Link
-                href="/#contact"
+                href="/portal"
                 className="group relative inline-flex items-center justify-center gap-2 overflow-hidden border border-[#3E5854] bg-[#3E5854] py-4 text-[11px] font-black uppercase tracking-[0.14em] text-white"
               >
                 <span
                   aria-hidden="true"
                   className="pointer-events-none absolute inset-y-0 -left-[40%] w-[40%] -skew-x-[20deg] bg-gradient-to-r from-transparent via-white/22 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[340%]"
                 />
-                <span className="relative z-10">Обсудить проект</span>
+                <span className="relative z-10">Портал исполнителей</span>
                 <svg className="relative z-10" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                   <path d="M2.5 6h7M7 3l3 3-3 3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>

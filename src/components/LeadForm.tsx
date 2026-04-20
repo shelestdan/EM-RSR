@@ -60,7 +60,7 @@ function validateField(name: string, value: string | boolean): string {
   }
   if (name === 'email') {
     const v = (value as string).trim()
-    if (!v) return 'Укажите рабочий email'
+    if (!v) return '' // optional
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Формат: name@company.ru'
     return ''
   }
@@ -398,14 +398,13 @@ export default function LeadForm({ source = 'website', className = '', dark = fa
         {/* Email */}
         <div>
           <label htmlFor={`${idP}-email`} className={labelClass}>
-            Email <span className={dark ? 'text-[#5f8b7d]' : 'text-[#3E5854]'}>*</span>
+            Email <span className={dark ? 'text-white/28' : 'text-[#626675]/60'}>— необязательно</span>
           </label>
           <input
             id={`${idP}-email`}
             name="email"
             type="email"
             autoComplete="email"
-            required
             maxLength={120}
             placeholder="name@company.ru"
             className={fieldClass('email')}

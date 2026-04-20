@@ -20,22 +20,7 @@ export default function ServicesPage() {
   return (
     <>
       {/* ─── HERO ──────────────────────────────────────────────── */}
-      <section className="section-dark relative min-h-[80vh] overflow-hidden pt-32 flex flex-col justify-end pb-16 sm:pb-20 lg:pb-24">
-        <div className="absolute inset-0 eng-grid-overlay opacity-40" aria-hidden="true" />
-
-        {/* Large background service index — decorative */}
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex flex-col justify-center gap-0 overflow-hidden pr-8 opacity-[0.055] select-none" aria-hidden="true">
-          {servicePillars.map((s) => (
-            <div
-              key={s.id}
-              className="font-brand font-black leading-[0.82] text-white"
-              style={{ fontSize: 'clamp(80px, 12vw, 160px)' }}
-            >
-              {s.title}
-            </div>
-          ))}
-        </div>
-
+      <section className="section-dark relative min-h-[60vh] overflow-hidden pt-32 flex flex-col justify-end pb-16 sm:pb-20 lg:pb-24">
         <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="mb-12 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/28" aria-label="Breadcrumb">
@@ -45,7 +30,7 @@ export default function ServicesPage() {
           </nav>
 
           {/* Kicker + h1 */}
-          <p className="overline-light mb-8">Инженерный цикл · ЕМ-ПСП</p>
+          <p className="overline-light mb-8">Инженерный цикл · EM-PCP</p>
           <h1
             className="font-brand font-black text-white max-w-[900px]"
             style={{ fontSize: 'clamp(36px, 5.5vw, 80px)', lineHeight: 0.95, letterSpacing: '-0.02em' }}
@@ -53,7 +38,7 @@ export default function ServicesPage() {
             Не набор услуг —<br />управляемая<br />система работ
           </h1>
           <p className="mt-10 max-w-[600px] text-[15px] leading-[1.75] text-white/50 sm:text-[17px]">
-            ЕМ-ПСП закрывает ключевые этапы инженерного объекта: от исходных данных до строительства, экспертизы и авторского надзора.
+            EM-PCP закрывает ключевые этапы инженерного объекта: от исходных данных до строительства, экспертизы и авторского надзора.
           </p>
 
           {/* Service quick-links */}
@@ -80,15 +65,6 @@ export default function ServicesPage() {
           id={service.id}
           className={`relative overflow-hidden border-b border-[#d9d6cb] ${index % 2 === 0 ? 'bg-white' : 'bg-[#f6f5f1]'}`}
         >
-          {/* Huge watermark number */}
-          <div
-            className="pointer-events-none absolute right-0 top-0 select-none font-brand font-black leading-none text-[#23273F] opacity-[0.025]"
-            style={{ fontSize: 'clamp(180px, 22vw, 320px)', lineHeight: 0.85, transform: 'translateY(-8%)' }}
-            aria-hidden="true"
-          >
-            {service.code}
-          </div>
-
           <div className="container relative mx-auto px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
 
             {/* Top label row */}
@@ -165,7 +141,7 @@ export default function ServicesPage() {
       ))}
 
       {/* ─── WORKFLOW ──────────────────────────────────────────── */}
-      <section className="section section-paper eng-grid-paper">
+      <section className="section section-paper">
         <div className="container mx-auto px-5 sm:px-6 lg:px-8">
 
           <ScrollReveal>
@@ -205,7 +181,6 @@ export default function ServicesPage() {
       {/* ─── CTA FORM ──────────────────────────────────────────── */}
       <section className="section section-dark relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5f8b7d]/36 to-transparent" aria-hidden="true" />
-        <div className="absolute inset-0 eng-grid-overlay opacity-28" aria-hidden="true" />
         <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
           <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:gap-24 lg:items-start">
 
@@ -235,10 +210,7 @@ export default function ServicesPage() {
 
             <ScrollReveal className="reveal-delay-2">
               <div className="border border-white/10 bg-[#0d101c]/70 p-7 sm:p-10">
-                <div className="mb-8 flex items-center justify-between">
-                  <h3 className="font-brand text-[18px] font-black text-white">Оставить заявку</h3>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/24">Бесплатно</span>
-                </div>
+                <h3 className="mb-8 font-brand text-[18px] font-black text-white">Оставить заявку</h3>
                 <LeadForm source="services" dark />
               </div>
             </ScrollReveal>
