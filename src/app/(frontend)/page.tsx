@@ -7,6 +7,19 @@ import ScrollReveal from '@/components/ScrollReveal'
 import SilentVideo from '@/components/SilentVideo'
 import { brand, metrics, principles, servicePillars, workflow } from '@/lib/site-data'
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+// KPI card — easily editable (CMS-friendly)
+const portfolioKpi = {
+  headline: { value: 150, suffix: '+', label: 'объектов в портфеле' },
+  grid: [
+    { value: 524, suffix: '+', label: 'газификация' },
+    { value: 80, suffix: '+', label: 'инженерные сети' },
+    { value: 40, suffix: '+', label: 'авторский надзор' },
+    { value: 5, suffix: '', label: 'регионов' },
+  ],
+}
+
 export const metadata: Metadata = {
   title: 'EM-PCP — инженерное проектирование, строительство, экспертиза',
   description:
@@ -37,14 +50,6 @@ export default function HomePage() {
           <div className="relative flex flex-col bg-[#07090f]">
             <div className="relative flex flex-1 flex-col justify-end px-5 pb-12 pt-14 sm:px-6 sm:pb-14 sm:pt-16 lg:px-[max(2rem,calc((100vw-1280px)/2+2rem))] lg:pb-20 lg:pt-20">
 
-              {/* Overline */}
-              <div className="mb-10 flex items-center gap-5 sm:mb-12">
-                <span className="h-px w-14 shrink-0 bg-[#5f8b7d]" aria-hidden="true" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8ab0a3]">
-                  Инженерный контур
-                </span>
-              </div>
-
               {/* H1 */}
               <h1
                 className="font-brand font-black leading-[0.95] text-white [text-wrap:balance]"
@@ -65,20 +70,14 @@ export default function HomePage() {
                 Изыскания, проект, экспертиза, строительство и надзор — один контрагент, управляемые сроки, точная цена.
               </p>
 
-              {/* CTA — one priority action */}
-              <div className="mt-10">
-                <Link href="/portal" className="btn btn-primary min-h-[54px] px-8 text-[12px]">
-                  Портал исполнителей
-                </Link>
-              </div>
-
             </div>
           </div>
 
           {/* RIGHT — VIDEO (40%) */}
           <div className="relative order-first min-h-[42vh] overflow-hidden border-b border-white/[0.08] bg-[#0a0d15] lg:order-none lg:min-h-0 lg:border-b-0 lg:border-l">
             <SilentVideo
-              src="/brand/EM-PCP%20mp4.mp4"
+              src={`${BASE}/brand/em-pcp-web.mp4`}
+              fallbackSrc={`${BASE}/brand/EM-PCP%20gif.gif`}
               className="absolute inset-0 h-full w-full"
               xOffset={0.5}
             />
@@ -104,16 +103,10 @@ export default function HomePage() {
             {metrics.map((metric, i) => (
               <div
                 key={metric.label}
-                className={`group py-6 transition-colors duration-300 hover:bg-white/[0.02] sm:py-7 ${i % 2 === 0 ? 'pr-4' : 'pl-4'} lg:px-6 ${
+                className={`py-7 sm:py-8 ${i % 2 === 0 ? 'pr-4' : 'pl-4'} lg:px-6 ${
                   i < 3 ? 'lg:border-r lg:border-white/[0.08]' : ''
                 } ${i < 2 ? 'border-r border-white/[0.08] lg:border-r-0' : ''}`}
               >
-                <div className="mb-3 flex items-center gap-3">
-                  <span className="font-brand text-[9px] font-black tracking-[0.22em] text-[#5f8b7d]">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span className="h-px w-6 bg-[#5f8b7d]/50 transition-all duration-300 group-hover:w-10" />
-                </div>
                 <div
                   className="font-brand font-black leading-none text-white tabular-nums"
                   style={{ fontSize: 'clamp(30px, 3.6vw, 52px)', letterSpacing: '-0.02em' }}
@@ -158,11 +151,7 @@ export default function HomePage() {
                   href={`/uslugi#${service.id}`}
                   className="group relative flex h-full flex-col overflow-hidden bg-white p-8 transition-all duration-400 hover:bg-[#191c2d] sm:min-h-[360px] sm:p-10"
                 >
-                  <span className="text-[11px] font-black tracking-[0.2em] text-[#3E5854] transition-colors duration-300 group-hover:text-[#8ab0a3]">
-                    {service.code}
-                  </span>
-                  <span className="mt-6 block h-px w-8 bg-[#d9d6cb] transition-all duration-500 group-hover:w-16 group-hover:bg-[#5f8b7d]" />
-                  <h3 className="mt-8 font-brand text-[24px] font-black leading-[1.1] text-[#23273F] transition-colors duration-300 group-hover:text-white">
+                  <h3 className="font-brand text-[24px] font-black leading-[1.1] text-[#23273F] transition-colors duration-300 group-hover:text-white">
                     {service.title}
                   </h3>
                   <p className="mt-5 text-[14px] leading-[1.78] text-[#626675] transition-colors duration-300 group-hover:text-white/58">
@@ -183,7 +172,6 @@ export default function HomePage() {
         <div className="container mx-auto px-5 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-end">
             <ScrollReveal>
-              <p className="section-kicker mb-5">Метод</p>
               <h2 className="section-title leading-[1]">Инженерная дисциплина вместо подрядного шума</h2>
             </ScrollReveal>
             <ScrollReveal className="reveal-delay-1">
@@ -197,14 +185,7 @@ export default function HomePage() {
             {workflow.map((step, index) => (
               <ScrollReveal key={step.title} className={`reveal-delay-${index + 1}`}>
                 <div className="group flex h-full flex-col bg-white p-8 transition-colors duration-300 hover:bg-[#f6f5f1] sm:p-10">
-                  <div
-                    className="font-brand font-black leading-none text-[#eeece4] transition-colors duration-300 group-hover:text-[#d9d6cb]"
-                    style={{ fontSize: 'clamp(72px, 6vw, 96px)' }}
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-                  <span className="mt-8 block h-px w-10 bg-[#3E5854]" />
-                  <h3 className="mt-7 font-brand text-[26px] font-black leading-tight text-[#23273F]">
+                  <h3 className="font-brand text-[26px] font-black leading-tight text-[#23273F]">
                     {step.title}
                   </h3>
                   <p className="mt-5 text-[15px] leading-[1.78] text-[#626675]">
@@ -334,53 +315,44 @@ export default function HomePage() {
               </div>
             </ScrollReveal>
 
-            {/* RIGHT — Stats card (KPI only) */}
+            {/* RIGHT — KPI card (150+ headline + 2×2 grid) */}
             <ScrollReveal className="reveal-delay-1">
-              <p className="section-kicker mb-5">Ключевые цифры</p>
-              <h2 className="section-title leading-[1.05]">Компания в цифрах</h2>
-
-              <div className="mt-10 border border-[#d9d6cb] bg-[#f6f5f1]">
-                <div className="grid grid-cols-2 divide-x divide-[#d9d6cb]">
-                  {metrics.slice(0, 2).map((metric, i) => (
-                    <div key={metric.label} className="p-7 sm:p-9">
-                      <span className="font-brand text-[9px] font-black tracking-[0.22em] text-[#3E5854]">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <div
-                        className="mt-4 font-brand font-black leading-none text-[#23273F] tabular-nums"
-                        style={{ fontSize: 'clamp(34px, 3.4vw, 52px)', letterSpacing: '-0.02em' }}
-                      >
-                        <AnimatedCounter target={metric.value} suffix={metric.suffix} />
-                      </div>
-                      <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-[#626675]">
-                        {metric.label}
-                      </div>
-                    </div>
-                  ))}
+              <div className="border border-white/[0.08] bg-[#0d101c] text-white">
+                {/* Headline */}
+                <div className="border-b border-white/[0.08] p-8 sm:p-10">
+                  <div
+                    className="font-brand font-black leading-none tabular-nums"
+                    style={{ fontSize: 'clamp(72px, 8vw, 120px)', letterSpacing: '-0.03em' }}
+                  >
+                    {portfolioKpi.headline.value.toLocaleString('ru-RU')}
+                    {portfolioKpi.headline.suffix}
+                  </div>
+                  <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-white/48">
+                    {portfolioKpi.headline.label}
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 divide-x divide-[#d9d6cb] border-t border-[#d9d6cb]">
-                  {metrics.slice(2, 4).map((metric, i) => (
-                    <div key={metric.label} className="p-7 sm:p-9">
-                      <span className="font-brand text-[9px] font-black tracking-[0.22em] text-[#3E5854]">
-                        {String(i + 3).padStart(2, '0')}
-                      </span>
+
+                {/* 2×2 grid */}
+                <div className="grid grid-cols-2">
+                  {portfolioKpi.grid.map((kpi, i) => (
+                    <div
+                      key={kpi.label}
+                      className={`p-7 sm:p-9 ${i % 2 === 0 ? 'border-r border-white/[0.08]' : ''} ${i < 2 ? 'border-b border-white/[0.08]' : ''}`}
+                    >
                       <div
-                        className="mt-4 font-brand font-black leading-none text-[#23273F] tabular-nums"
-                        style={{ fontSize: 'clamp(34px, 3.4vw, 52px)', letterSpacing: '-0.02em' }}
+                        className="font-brand font-black leading-none tabular-nums"
+                        style={{ fontSize: 'clamp(34px, 3.6vw, 52px)', letterSpacing: '-0.02em' }}
                       >
-                        <AnimatedCounter target={metric.value} suffix={metric.suffix} />
+                        {kpi.value.toLocaleString('ru-RU')}
+                        {kpi.suffix}
                       </div>
-                      <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-[#626675]">
-                        {metric.label}
+                      <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white/52">
+                        {kpi.label}
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
-
-              <p className="mt-6 text-[13px] leading-[1.65] text-[#626675]">
-                Данные обновляются из конфигурации. Состав работ, примеры объектов, СРО и ISO, реквизиты — в одном PDF-файле.
-              </p>
             </ScrollReveal>
           </div>
         </div>

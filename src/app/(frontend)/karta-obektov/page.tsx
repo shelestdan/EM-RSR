@@ -90,11 +90,7 @@ export default async function MapPage() {
             {servicePillars.map((pillar, i) => (
               <ScrollReveal key={pillar.id} className={`reveal-delay-${(i % 4) + 1}`}>
                 <div className="flex h-full flex-col bg-white p-8 sm:min-h-[320px] sm:p-9">
-                  <div className="font-brand text-[13px] font-black tracking-[0.22em] text-[#3E5854]">
-                    {pillar.code}
-                  </div>
-                  <span className="mt-5 block h-px w-10 bg-[#3E5854]" />
-                  <h3 className="mt-6 font-brand text-[22px] font-black leading-[1.15] text-[#23273F]">
+                  <h3 className="font-brand text-[22px] font-black leading-[1.15] text-[#23273F]">
                     {pillar.title}
                   </h3>
                   <ul className="mt-6 space-y-2.5 text-[14px] leading-[1.55] text-[#626675]">

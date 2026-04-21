@@ -49,7 +49,6 @@ export default function ServicesPage() {
                 href={`#${s.id}`}
                 className="group flex items-center justify-between gap-4 border border-white/8 bg-white/[0.03] px-5 py-4 text-[11px] font-black uppercase tracking-[0.1em] text-white/42 transition-all duration-200 hover:border-[#5f8b7d]/50 hover:bg-[#5f8b7d]/10 hover:text-white sm:flex-1 sm:flex-col sm:items-start sm:justify-start sm:gap-3"
               >
-                <span className="text-[#5f8b7d] transition-colors group-hover:text-[#8ab0a3]">{s.code}</span>
                 <span className="leading-tight">{s.title}</span>
                 <Arrow />
               </a>
@@ -66,15 +65,6 @@ export default function ServicesPage() {
           className={`relative overflow-hidden border-b border-[#d9d6cb] ${index % 2 === 0 ? 'bg-white' : 'bg-[#f6f5f1]'}`}
         >
           <div className="container relative mx-auto px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
-
-            {/* Top label row */}
-            <ScrollReveal>
-              <div className="mb-10 flex items-center gap-5 sm:mb-14">
-                <span className="text-[11px] font-black tracking-[0.22em] text-[#3E5854]">{service.code}</span>
-                <span className="h-px flex-1 max-w-[48px] bg-[#3E5854]" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#626675]/60">Услуга</span>
-              </div>
-            </ScrollReveal>
 
             {/* Main grid */}
             <div className="grid gap-14 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:items-start">

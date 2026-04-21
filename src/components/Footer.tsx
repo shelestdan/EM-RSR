@@ -24,7 +24,7 @@ export default function Footer() {
           <div>
             <Link href="/" className="flex items-center gap-3" aria-label="ЕМ-ПСП — главная">
               <span className="relative grid h-12 w-12 place-items-center">
-                <Image src="/brand/logo-icon-white.svg" alt="" width={42} height={42} className="h-11 w-11 object-contain" />
+                <Image src="/brand/logo-icon.svg" alt="" width={42} height={42} className="h-11 w-11 object-contain" />
               </span>
               <span>
                 <span className="block font-brand text-[22px] font-black leading-none tracking-[0.03em]">ЕМ-ПСП</span>

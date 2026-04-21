@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 
 interface Props {
   src: string
+  fallbackSrc?: string
   className?: string
   style?: React.CSSProperties
   /** objectPosition equivalent: x offset 0–1 (default 0.5 = center) */
@@ -16,7 +17,7 @@ interface Props {
  * does NOT appear on canvas elements — only on <video> elements.
  * The actual <video> is hidden off-screen at -9999px.
  */
-export default function SilentVideo({ src, className = '', style, xOffset = 0.5 }: Props) {
+export default function SilentVideo({ src, fallbackSrc, className = '', style, xOffset = 0.5 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function SilentVideo({ src, className = '', style, xOffset = 0.5 
     video.autoplay = true
     video.muted = true
     video.loop = true
+    video.preload = 'auto'
     video.playsInline = true
     video.setAttribute('playsinline', '')
     video.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;'
@@ -72,23 +74,61 @@ export default function SilentVideo({ src, className = '', style, xOffset = 0.5 
       raf = requestAnimationFrame(draw)
     }
 
+    function drawFirstFrame() {
+      if (!alive || !ctx || !canvas) return
+      const cw = canvas.width
+      const ch = canvas.height
+      const vw = video.videoWidth
+      const vh = video.videoHeight
+      if (!cw || !ch || !vw || !vh) return
+
+      const scale = Math.max(cw / vw, ch / vh)
+      const sw = vw * scale
+      const sh = vh * scale
+      const dx = -(sw - cw) * xOffset
+      const dy = -(sh - ch) * 0.5
+
+      ctx.clearRect(0, 0, cw, ch)
+      ctx.drawImage(video, dx, dy, sw, sh)
+    }
+
     resize()
     const ro = new ResizeObserver(resize)
     ro.observe(canvas)
+    video.addEventListener('loadeddata', drawFirstFrame)
+    video.load()
 
     video.play().then(draw).catch(() => {
       // autoplay blocked — draw first frame on user interaction
-      document.addEventListener('pointerdown', () => video.play().then(draw), { once: true })
+      document.addEventListener('pointerdown', () => video.play().then(draw).catch(() => drawFirstFrame()), { once: true })
     })
 
     return () => {
       alive = false
       cancelAnimationFrame(raf)
       ro.disconnect()
+      video.removeEventListener('loadeddata', drawFirstFrame)
       video.pause()
       document.body.removeChild(video)
     }
   }, [src, xOffset])
 
-  return <canvas ref={canvasRef} className={className} style={style} />
+  return (
+    <>
+      {fallbackSrc ? (
+        <img
+          src={fallbackSrc}
+          alt=""
+          aria-hidden="true"
+          className={className}
+          style={{
+            ...style,
+            objectFit: 'cover',
+            objectPosition: `${xOffset * 100}% 50%`,
+          }}
+        />
+      ) : null}
+      <canvas ref={canvasRef} className={className} style={style} />
+    </>
+  )
 }
