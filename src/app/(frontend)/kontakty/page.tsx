@@ -92,26 +92,18 @@ export default function ContactsPage() {
                   >
                     {brand.phone}
                   </a>
-                  <p className="mt-3 text-[14px] leading-[1.65] text-[#626675]">
+                  <a
+                    href={brand.maxHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-2 text-[13px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-colors hover:text-[#23273F]"
+                  >
+                    <MaxIcon />
+                    Написать в MAX
+                  </a>
+                  <p className="mt-2 text-[14px] leading-[1.65] text-[#626675]">
                     По всем вопросам
                   </p>
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <a
-                      href={brand.maxHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group inline-flex items-center gap-2 border border-[#3E5854] bg-[#3E5854] px-5 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-white transition-all hover:bg-[#23273F]"
-                    >
-                      <MaxIcon />
-                      Написать в MAX
-                    </a>
-                    <a
-                      href={brand.phoneHref}
-                      className="inline-flex items-center gap-2 border border-[#d9d6cb] bg-white px-5 py-3 text-[11px] font-black uppercase tracking-[0.14em] text-[#23273F] transition-all hover:border-[#3E5854] hover:text-[#3E5854]"
-                    >
-                      Позвонить
-                    </a>
-                  </div>
                 </div>
               </div>
             </ScrollReveal>
@@ -169,7 +161,20 @@ export default function ContactsPage() {
                 Форма не заменяет ТЗ. Она помогает быстро понять контекст и подготовить предметный разговор.
               </p>
 
-              <div className="mt-10 border-l-[3px] border-[#3E5854] bg-white px-6 py-5">
+              <div className="mt-8 divide-y divide-[#d9d6cb]">
+                {[
+                  { title: 'Заявка', body: 'Заполняете форму или пишете на email. Честный минимум полей.' },
+                  { title: 'Разбор', body: 'Смотрим контекст, задаём 2–3 уточняющих вопроса по сути.' },
+                  { title: 'Предложение', body: 'Возвращаемся с составом работ, сроками и стоимостью.' },
+                ].map(({ title, body }) => (
+                  <div key={title} className="py-5">
+                    <p className="font-brand text-[16px] font-black text-[#23273F]">{title}</p>
+                    <p className="mt-1.5 text-[14px] leading-[1.65] text-[#626675]">{body}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-8 border-l-[3px] border-[#3E5854] bg-white px-6 py-5">
                 <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#3E5854]">Не любите формы?</p>
                 <p className="text-[14px] leading-[1.7] text-[#23273F]">
                   Напишите на <a href={brand.emailHref} className="font-bold underline decoration-[#3E5854]/40 underline-offset-2 hover:text-[#3E5854]">{brand.email}</a> или позвоните <a href={brand.phoneHref} className="font-bold underline decoration-[#3E5854]/40 underline-offset-2 hover:text-[#3E5854]">{brand.phone}</a>.
