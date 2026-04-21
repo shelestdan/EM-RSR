@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   basePath: isGithubPages ? '/EM-RSR' : undefined,
   assetPrefix: isGithubPages ? '/EM-RSR' : undefined,
   trailingSlash: isGithubPages ? true : undefined,
+  env: {
+    NEXT_PUBLIC_BASE_PATH: isGithubPages ? '/EM-RSR' : '',
+  },
   devIndicators: false,
   experimental: {
     reactCompiler: false,

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import ScrollReveal from '@/components/ScrollReveal'
+
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export const metadata: Metadata = {
   title: 'О компании — EM-PCP',
@@ -188,7 +189,7 @@ export default function AboutPage() {
             {certDocs.map((cert) => (
               <ScrollReveal key={cert.code_full}>
                 <a
-                  href={cert.pdfUrl}
+                  href={`${BASE}${cert.pdfUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   download
@@ -203,13 +204,14 @@ export default function AboutPage() {
                     </div>
                     {/* PDF first-page thumbnail */}
                     <div className="shrink-0 w-[72px] overflow-hidden border border-[#d9d6cb] shadow-sm transition-shadow duration-300 group-hover:shadow-md">
-                      <Image
-                        src={cert.previewUrl}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={`${BASE}${cert.previewUrl}`}
                         alt={`Сертификат ${cert.code_full}, первая страница`}
                         width={144}
                         height={204}
                         className="block w-full"
-                        unoptimized
+                        loading="lazy"
                       />
                     </div>
                   </div>
