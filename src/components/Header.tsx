@@ -34,7 +34,6 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [progress, setProgress] = useState(0)
-  const [time, setTime] = useState('')
   const pathname = usePathname()
   const navRef = useRef<HTMLDivElement>(null)
   const [indicator, setIndicator] = useState<{ left: number; width: number; opacity: number }>({
@@ -71,20 +70,6 @@ export default function Header() {
       window.removeEventListener('scroll', onScroll)
       if (rafId) cancelAnimationFrame(rafId)
     }
-  }, [])
-
-  // MSK clock (top rail)
-  useEffect(() => {
-    const update = () => {
-      const now = new Date()
-      const msk = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }))
-      const hh = String(msk.getHours()).padStart(2, '0')
-      const mm = String(msk.getMinutes()).padStart(2, '0')
-      setTime(`${hh}:${mm}`)
-    }
-    update()
-    const id = setInterval(update, 30_000)
-    return () => clearInterval(id)
   }, [])
 
   // Close mobile on route change
@@ -164,50 +149,6 @@ export default function Header() {
           : 'bg-gradient-to-b from-[#07090f]/80 via-[#07090f]/48 to-transparent backdrop-blur-md'
       }`}
     >
-      {/* ─── TOP META RAIL ────────────────────────────────────── */}
-      <div
-        className={`overflow-hidden border-b border-white/[0.06] transition-all duration-500 ease-out ${
-          scrolled ? 'max-h-0 opacity-0' : 'max-h-[44px] opacity-100'
-        }`}
-        aria-hidden={scrolled}
-      >
-        <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="flex h-[34px] items-center justify-between gap-6 text-[9px] font-black uppercase tracking-[0.22em] text-white/40">
-            <div className="flex items-center gap-4">
-              <span className="inline-flex items-center gap-2">
-                <span className="relative inline-flex h-1.5 w-1.5">
-                  <span className="absolute inset-0 animate-ping rounded-full bg-[#5f8b7d]/80" />
-                  <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-[#5f8b7d]" />
-                </span>
-                <span className="text-white/52">N°001 · EM-PSP</span>
-              </span>
-              <span className="hidden h-3 w-px bg-white/10 sm:inline-block" />
-              <span className="hidden sm:inline">СРО · ISO · 150+ объектов</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="hidden md:inline-flex items-center gap-2">
-                <span className="text-white/32">MSK</span>
-                <span className="tabular-nums text-white/62">{time || '—'}</span>
-              </span>
-              <span className="hidden h-3 w-px bg-white/10 md:inline-block" />
-              <a
-                href="mailto:em-psp@mail.ru"
-                className="hidden transition-colors hover:text-white sm:inline"
-              >
-                em-psp@mail.ru
-              </a>
-              <span className="hidden h-3 w-px bg-white/10 sm:inline-block" />
-              <a
-                href="tel:+79892888980"
-                className="transition-colors hover:text-white"
-              >
-                +7 (989) 288-89-80
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* ─── MAIN BAR ─────────────────────────────────────────── */}
       <div
         className={`container mx-auto px-5 transition-all duration-500 ease-out sm:px-6 lg:px-8 ${

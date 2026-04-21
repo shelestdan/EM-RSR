@@ -65,13 +65,10 @@ export default function HomePage() {
                 Изыскания, проект, экспертиза, строительство и надзор — один контрагент, управляемые сроки, точная цена.
               </p>
 
-              {/* CTAs */}
-              <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              {/* CTA — one priority action */}
+              <div className="mt-10">
                 <Link href="/portal" className="btn btn-primary min-h-[54px] px-8 text-[12px]">
                   Портал исполнителей
-                </Link>
-                <Link href="/proekty" className="btn btn-outline-white min-h-[54px] px-8 text-[12px]">
-                  Смотреть проекты
                 </Link>
               </div>
 
@@ -299,57 +296,91 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── PRESENTATION ─────────────────────────────────────── */}
+      {/* ─── PRESENTATION + KPI ───────────────────────────────── */}
       <section className="section section-white">
         <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-16">
+          <div className="grid gap-12 lg:grid-cols-[auto_1fr] lg:items-start lg:gap-20">
+
+            {/* LEFT — A4 cover + CTA */}
             <ScrollReveal>
-              {/* A4 portrait placeholder */}
-              <div
-                className="mx-auto border border-[#d9d6cb] bg-white shadow-[0_30px_80px_rgba(13,16,28,0.12)]"
-                style={{ width: 280, aspectRatio: '210 / 297' }}
-              >
-                <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
-                  <Image
-                    src="/brand/logo-icon.svg"
-                    alt=""
-                    width={56}
-                    height={56}
-                    className="h-14 w-14 object-contain"
-                  />
-                  <div className="font-brand text-[28px] font-black leading-none text-[#23273F]">
-                    {brand.short}
-                  </div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#626675]/60">
-                    Presentation · A4
+              <div className="flex flex-col items-center gap-6 lg:items-start">
+                {/* A4 portrait placeholder (empty white — to be replaced by real cover) */}
+                <div
+                  className="border border-[#d9d6cb] bg-white shadow-[0_30px_80px_rgba(13,16,28,0.12)]"
+                  style={{ width: 280, aspectRatio: '210 / 297' }}
+                  aria-label="Обложка презентации EM-PCP, формат A4"
+                >
+                  <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
+                    <Image
+                      src="/brand/logo-icon.svg"
+                      alt=""
+                      width={56}
+                      height={56}
+                      className="h-14 w-14 object-contain opacity-40"
+                    />
+                    <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#626675]/50">
+                      Обложка · A4
+                    </div>
                   </div>
                 </div>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal className="reveal-delay-1">
-              <p className="section-kicker mb-5">Презентация</p>
-              <h2 className="section-title leading-[1.05]">Материалы о компании одним файлом</h2>
-              <p className="body-large mt-6 max-w-[520px]">
-                Состав работ, примеры объектов, СРО и ISO, реквизиты — в одном PDF. Откроется в браузере.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
                 <a
                   href={brand.presentationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary min-h-[52px] px-7 text-[12px]"
+                  className="btn btn-primary min-h-[52px] w-full max-w-[280px] px-7 text-[12px]"
                 >
                   Смотреть презентацию
                 </a>
-                <a
-                  href={brand.presentationUrl}
-                  download
-                  className="btn btn-outline-dark min-h-[52px] px-7 text-[12px]"
-                >
-                  Скачать PDF
-                </a>
               </div>
+            </ScrollReveal>
+
+            {/* RIGHT — Stats card (KPI only) */}
+            <ScrollReveal className="reveal-delay-1">
+              <p className="section-kicker mb-5">Ключевые цифры</p>
+              <h2 className="section-title leading-[1.05]">Компания в цифрах</h2>
+
+              <div className="mt-10 border border-[#d9d6cb] bg-[#f6f5f1]">
+                <div className="grid grid-cols-2 divide-x divide-[#d9d6cb]">
+                  {metrics.slice(0, 2).map((metric, i) => (
+                    <div key={metric.label} className="p-7 sm:p-9">
+                      <span className="font-brand text-[9px] font-black tracking-[0.22em] text-[#3E5854]">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <div
+                        className="mt-4 font-brand font-black leading-none text-[#23273F] tabular-nums"
+                        style={{ fontSize: 'clamp(34px, 3.4vw, 52px)', letterSpacing: '-0.02em' }}
+                      >
+                        <AnimatedCounter target={metric.value} suffix={metric.suffix} />
+                      </div>
+                      <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-[#626675]">
+                        {metric.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 divide-x divide-[#d9d6cb] border-t border-[#d9d6cb]">
+                  {metrics.slice(2, 4).map((metric, i) => (
+                    <div key={metric.label} className="p-7 sm:p-9">
+                      <span className="font-brand text-[9px] font-black tracking-[0.22em] text-[#3E5854]">
+                        {String(i + 3).padStart(2, '0')}
+                      </span>
+                      <div
+                        className="mt-4 font-brand font-black leading-none text-[#23273F] tabular-nums"
+                        style={{ fontSize: 'clamp(34px, 3.4vw, 52px)', letterSpacing: '-0.02em' }}
+                      >
+                        <AnimatedCounter target={metric.value} suffix={metric.suffix} />
+                      </div>
+                      <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-[#626675]">
+                        {metric.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <p className="mt-6 text-[13px] leading-[1.65] text-[#626675]">
+                Данные обновляются из конфигурации. Состав работ, примеры объектов, СРО и ISO, реквизиты — в одном PDF-файле.
+              </p>
             </ScrollReveal>
           </div>
         </div>

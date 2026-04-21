@@ -22,13 +22,19 @@ export default function Footer() {
       <div className="container mx-auto px-5 py-14 sm:px-6 lg:px-8 lg:py-18">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_0.7fr_0.7fr_0.9fr]">
           <div>
-            <Link href="/" className="flex items-center gap-3" aria-label="EM-PCP — главная">
+            <Link href="/" className="flex items-center gap-3" aria-label="ЕМ-ПСП — главная">
               <span className="relative grid h-12 w-12 place-items-center">
                 <Image src="/brand/logo-icon-white.svg" alt="" width={42} height={42} className="h-11 w-11 object-contain" />
               </span>
               <span>
-                <span className="block font-brand text-[22px] font-black leading-none tracking-[0.03em]">EM-PCP</span>
-                <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.16em] text-white/45">
+                <span className="block font-brand text-[22px] font-black leading-none tracking-[0.03em]">ЕМ-ПСП</span>
+                <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.16em] text-white/56">
+                  Инженерные · Проекты · Строительство
+                </span>
+                <span className="mt-3 block font-brand text-[15px] font-black leading-none tracking-[0.03em] text-white/72">
+                  EM-PCP
+                </span>
+                <span className="mt-1 block text-[10px] font-semibold uppercase tracking-[0.16em] text-white/40">
                   Engineering · Project · Construction
                 </span>
               </span>
