@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import ScrollReveal from '@/components/ScrollReveal'
 
@@ -49,17 +50,20 @@ const certDocs = [
   {
     code_full: 'ГОСТ ISO 9001-2015',
     sublabel: 'Система менеджмента качества',
-    // pdfUrl: '/certs/iso-9001.pdf' — файл добавить в public/certs/
+    pdfUrl: '/certs/iso-9001.pdf',
+    previewUrl: '/certs/iso-9001-preview.jpg',
   },
   {
     code_full: 'ГОСТ Р ИСО 14001-2016',
     sublabel: 'Экологический менеджмент',
-    // pdfUrl: '/certs/iso-14001.pdf'
+    pdfUrl: '/certs/iso-14001.pdf',
+    previewUrl: '/certs/iso-14001-preview.jpg',
   },
   {
     code_full: 'ГОСТ Р ИСО 45001-2020',
     sublabel: 'Охрана труда и безопасность',
-    // pdfUrl: '/certs/iso-45001.pdf'
+    pdfUrl: '/certs/iso-45001.pdf',
+    previewUrl: '/certs/iso-45001-preview.jpg',
   },
 ]
 
@@ -149,11 +153,16 @@ export default function AboutPage() {
             </div>
           </ScrollReveal>
 
-          {/* SRO row */}
+          {/* SRO row — each card IS a link to NOPRIZ registry */}
           <div className="grid gap-px bg-[#d9d6cb] lg:grid-cols-2">
             {sroDocs.map((sro) => (
               <ScrollReveal key={sro.number} className="h-full">
-                <div className="flex h-full flex-col bg-[#f6f5f1] p-7 sm:p-10">
+                <a
+                  href="https://www.nopriz.ru/nreestr/electronnyy-reestr/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex h-full flex-col bg-[#f6f5f1] p-7 transition-colors hover:bg-[#edecea] sm:p-10"
+                >
                   <div className="flex items-center gap-3">
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#3E5854" strokeWidth="1.4" aria-hidden="true">
                       <path d="M14 3l9 4v6c0 5.5-3.8 10-9 11-5.2-1-9-5.5-9-11V7l9-4Z" />
@@ -166,44 +175,48 @@ export default function AboutPage() {
                   </p>
                   <p className="mt-1 font-mono text-[12px] text-[#626675]/70">ИНН {sro.inn}</p>
                   <p className="mt-4 text-[14px] leading-[1.7] text-[#626675]">{sro.body}</p>
-                </div>
+                  <div className="mt-auto pt-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-all group-hover:gap-3">
+                    Проверить в реестре НОПРИЗ <Arrow />
+                  </div>
+                </a>
               </ScrollReveal>
             ))}
           </div>
 
-          {/* NOPRIZ registry link */}
-          <ScrollReveal>
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border border-[#d9d6cb] bg-[#f6f5f1] px-6 py-4">
-              <p className="text-[13px] text-[#626675]">Реестр членов СРО на сайте НОПРИЗ</p>
-              <a
-                href="https://www.nopriz.ru/nreestr/electronnyy-reestr/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 border border-[#23273F] bg-[#23273F] px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-white transition-colors hover:bg-[#3E5854] hover:border-[#3E5854]"
-              >
-                Проверить в реестре <Arrow />
-              </a>
-            </div>
-          </ScrollReveal>
-
-          {/* ISO cards — simplified */}
+          {/* ISO cards — with PDF preview thumbnails */}
           <div className="mt-3 grid gap-px bg-[#d9d6cb] md:grid-cols-3">
             {certDocs.map((cert) => (
               <ScrollReveal key={cert.code_full}>
-                {/* TODO: wrap in <a href={cert.pdfUrl}> when PDF files added to /public/certs/ */}
-                <div className="group flex h-full flex-col bg-white p-7 transition-colors duration-300 hover:bg-[#f6f5f1] sm:p-8">
-                  <h3 className="font-brand text-[20px] font-black leading-tight text-[#23273F]">
-                    {cert.code_full}
-                  </h3>
-                  <p className="mt-3 text-[13px] leading-[1.65] text-[#626675]">{cert.sublabel}</p>
-                  <div className="mt-auto pt-8">
-                    <span className="inline-grid h-8 w-8 place-items-center border border-[#3E5854]/24 bg-[#f6f5f1] text-[#3E5854] transition-all duration-300 group-hover:border-[#3E5854] group-hover:bg-[#3E5854] group-hover:text-white">
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6">
-                        <path d="M3 6l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </span>
+                <a
+                  href={cert.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="group flex h-full flex-col bg-white p-7 transition-colors duration-300 hover:bg-[#f6f5f1] sm:p-8"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-brand text-[18px] font-black leading-tight text-[#23273F]">
+                        {cert.code_full}
+                      </h3>
+                      <p className="mt-2 text-[13px] leading-[1.65] text-[#626675]">{cert.sublabel}</p>
+                    </div>
+                    {/* PDF first-page thumbnail */}
+                    <div className="shrink-0 w-[72px] overflow-hidden border border-[#d9d6cb] shadow-sm transition-shadow duration-300 group-hover:shadow-md">
+                      <Image
+                        src={cert.previewUrl}
+                        alt={`Сертификат ${cert.code_full}, первая страница`}
+                        width={144}
+                        height={204}
+                        className="block w-full"
+                        unoptimized
+                      />
+                    </div>
                   </div>
-                </div>
+                  <div className="mt-auto pt-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-all group-hover:gap-3">
+                    Открыть сертификат <Arrow />
+                  </div>
+                </a>
               </ScrollReveal>
             ))}
           </div>
