@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import LeadForm from '@/components/LeadForm'
 import ScrollReveal from '@/components/ScrollReveal'
 import { brand } from '@/lib/site-data'
@@ -48,13 +47,6 @@ export default function ContactsPage() {
       {/* ─── HERO ──────────────────────────────────────────────── */}
       <section className="section-dark relative overflow-hidden pt-32 pb-14 sm:pb-20 lg:pb-24">
         <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
-          <nav className="mb-10 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/28" aria-label="Breadcrumb">
-            <Link href="/" className="transition-colors hover:text-white/60">Главная</Link>
-            <span className="text-white/16">/</span>
-            <span className="text-white/50">Контакты</span>
-          </nav>
-
-          <p className="overline-light mb-8">Связь · EM-PCP</p>
           <h1
             className="font-brand font-black text-white max-w-[1040px] [text-wrap:balance]"
             style={{ fontSize: 'clamp(32px, 4.6vw, 68px)', lineHeight: 1.02, letterSpacing: '-0.02em' }}
@@ -75,7 +67,7 @@ export default function ContactsPage() {
             <div className="mb-12 grid gap-8 border-b border-[#d9d6cb] pb-12 sm:mb-14 sm:pb-14 lg:grid-cols-[1fr_1fr] lg:items-end">
               <h2 className="section-title leading-[1.02]">Прямые каналы связи</h2>
               <p className="body-large max-w-[460px]">
-                Один номер, мессенджер MAX и один email — без отделов и переадресаций. Отвечает инженер-менеджер.
+                Один номер телефона и один email — без отделов, фильтрации и переадресаций.
               </p>
             </div>
           </ScrollReveal>
@@ -90,7 +82,7 @@ export default function ContactsPage() {
                   <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
                     <PhoneIcon />
                   </span>
-                  <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[#23273F]">Телефон</p>
+                  <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">Телефон</p>
                 </div>
                 <div>
                   <a
@@ -131,7 +123,7 @@ export default function ContactsPage() {
                   <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
                     <MailIcon />
                   </span>
-                  <p className="text-[12px] font-black uppercase tracking-[0.16em] text-[#23273F]">Почта</p>
+                  <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">Почта</p>
                 </div>
                 <div>
                   <a
@@ -141,9 +133,8 @@ export default function ContactsPage() {
                   >
                     {brand.email}
                   </a>
-                  <p className="mt-3 text-[14px] leading-[1.65] text-[#626675]">
-                    Срок ответа: {brand.sla}
-                  </p>
+                  <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#626675]/60">Срок</p>
+                  <p className="mt-1 text-[15px] font-semibold leading-[1.5] text-[#23273F]">{brand.sla}</p>
                 </div>
               </div>
             </ScrollReveal>
@@ -281,10 +272,6 @@ export default function ContactsPage() {
       {/* ─── LEGAL ─────────────────────────────────────────────── */}
       <section id="legal" className="border-y border-[#d9d6cb] bg-[#f6f5f1] py-12 sm:py-14">
         <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-          <ScrollReveal>
-            <p className="section-kicker mb-6">Реквизиты</p>
-          </ScrollReveal>
-
           <div className="grid gap-px bg-[#d9d6cb] md:grid-cols-2 lg:grid-cols-4">
             {[
               ['Наименование', brand.legalName],
