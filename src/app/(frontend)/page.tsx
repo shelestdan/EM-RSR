@@ -5,7 +5,7 @@ import AnimatedCounter from '@/components/AnimatedCounter'
 import LeadForm from '@/components/LeadForm'
 import ScrollReveal from '@/components/ScrollReveal'
 import SilentVideo from '@/components/SilentVideo'
-import { brand, metrics, principles, servicePillars, trustBadges, workflow } from '@/lib/site-data'
+import { brand, metrics, principles, servicePillars, workflow } from '@/lib/site-data'
 
 export const metadata: Metadata = {
   title: 'EM-PCP — инженерное проектирование, строительство, экспертиза',
@@ -29,24 +29,6 @@ export default function HomePage() {
     <>
       {/* ─── HERO ─────────────────────────────────────────────── */}
       <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-[#07090f] text-white">
-
-        {/* ─── TOP META RAIL ──────────────────────────────── */}
-        <div className="relative z-20 border-b border-white/[0.06] bg-[#07090f]/70 backdrop-blur-sm">
-          <div className="container mx-auto flex items-center justify-between gap-6 px-5 pt-28 pb-3 sm:px-6 sm:pt-32 lg:px-8 lg:pt-36">
-            <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.22em] text-white/52">
-              <span className="relative inline-flex h-1.5 w-1.5 shrink-0">
-                <span className="absolute inset-0 animate-ping rounded-full bg-[#5f8b7d]/80" />
-                <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-[#5f8b7d]" />
-              </span>
-              <span>{brand.short}</span>
-            </div>
-            <div className="hidden items-center gap-6 text-[9px] font-bold uppercase tracking-[0.22em] text-white/32 md:flex">
-              <span>КРАСНОДАР · СПБ</span>
-              <span className="h-px w-4 bg-white/20" />
-              <span>2023 — 2026</span>
-            </div>
-          </div>
-        </div>
 
         {/* ─── SPLIT BODY 60/40 ───────────────────────────── */}
         <div className="relative z-10 grid flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
@@ -93,20 +75,6 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Trust strip */}
-              <div className="mt-14 border-t border-white/[0.08] pt-7">
-                <div className="flex flex-wrap items-center gap-x-6 gap-y-3 md:gap-x-7">
-                  {trustBadges.map((badge, i) => (
-                    <span
-                      key={badge}
-                      className={`flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/48 ${i > 0 ? 'md:pl-6 md:border-l md:border-white/[0.1] md:gap-3 md:pl-7' : ''}`}
-                    >
-                      <span className="h-1 w-1 shrink-0 rounded-full bg-[#5f8b7d]" aria-hidden="true" />
-                      {badge}
-                    </span>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
 
@@ -435,23 +403,6 @@ export default function HomePage() {
                 ))}
               </div>
 
-              <div className="mt-8 border-t border-white/[0.08] pt-8">
-                <p className="mb-4 text-[9px] font-black uppercase tracking-[0.26em] text-white/20">
-                  Допуски и сертификаты
-                </p>
-                <div className="space-y-2.5">
-                  {[
-                    'СРО проектирование П-174',
-                    'СРО изыскания И-037',
-                    'ISO 9001 · 14001 · 45001',
-                  ].map((b) => (
-                    <div key={b} className="flex items-center gap-3">
-                      <span className="h-1.5 w-1.5 shrink-0 bg-[#5f8b7d]" />
-                      <span className="text-[11px] text-white/32">{b}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </ScrollReveal>
 
             <ScrollReveal className="reveal-delay-2">

@@ -13,13 +13,10 @@ const footerLinks = {
   legal: [
     { href: '/privacy-policy', label: 'Политика конфиденциальности' },
     { href: '/terms', label: 'Пользовательское соглашение' },
-    { href: '/portal', label: 'Портал исполнителей' },
   ],
 }
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear()
-
   return (
     <footer className="bg-[#0d101c] text-white">
       <div className="container mx-auto px-5 py-14 sm:px-6 lg:px-8 lg:py-18">
@@ -89,12 +86,6 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="container mx-auto flex flex-col gap-3 px-5 py-5 text-[12px] text-white/34 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <div>© {currentYear} {brand.legalName}. ИНН {brand.inn} · КПП {brand.kpp}</div>
-          <div>ISO 9001 · ISO 14001 · ISO 45001</div>
-        </div>
-      </div>
     </footer>
   )
 }
