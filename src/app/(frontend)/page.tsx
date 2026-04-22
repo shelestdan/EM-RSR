@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import AnimatedCounter from '@/components/AnimatedCounter'
 import LeadForm from '@/components/LeadForm'
@@ -292,7 +291,8 @@ export default function HomePage() {
                   aria-label="Обложка презентации EM-PCP, формат A4"
                 >
                   <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={`${BASE}/brand/logo-icon.svg`}
                       alt=""
                       width={56}

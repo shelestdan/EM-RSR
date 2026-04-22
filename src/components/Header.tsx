@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -175,12 +174,12 @@ export default function Header() {
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-0 border border-[#5f8b7d]/0 transition-all duration-500 group-hover:inset-[-4px] group-hover:border-[#5f8b7d]/60"
               />
-              <Image
-                src={`${BASE}/brand/logo-icon.svg`}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`${BASE}/brand/logo-icon-white.svg`}
                 alt=""
                 width={40}
                 height={40}
-                priority
                 className={`object-contain transition-all duration-500 ${
                   scrolled ? 'h-9 w-9' : 'h-11 w-11'
                 }`}
