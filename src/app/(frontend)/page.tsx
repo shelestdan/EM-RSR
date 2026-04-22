@@ -19,6 +19,29 @@ const portfolioKpi = {
   ],
 }
 
+const homeServiceCards = [
+  {
+    id: 'izyskaniya-kadastr',
+    title: 'Проектная база',
+    body: 'Изыскания, исходные данные, проектная и рабочая документация в одной связке.',
+  },
+  {
+    id: 'proektirovanie',
+    title: 'Инженерные сети',
+    body: 'Наружные и внутренние системы водоснабжения, канализации, газоснабжения и сопутствующей инфраструктуры.',
+  },
+  {
+    id: 'promyshlennoe-stroitelstvo',
+    title: 'Строительство и монтаж',
+    body: 'СМР по проекту, контроль сроков, исполнительная документация и координация на объекте.',
+  },
+  {
+    id: 'avtorskij-nadzor',
+    title: 'Экспертиза и надзор',
+    body: 'Сопровождение замечаний, авторский надзор, контроль соответствия документации и фактических работ.',
+  },
+]
+
 export const metadata: Metadata = {
   title: 'EM-PCP — инженерное проектирование, строительство, экспертиза',
   description:
@@ -79,6 +102,7 @@ export default function HomePage() {
               fallbackSrc={`${BASE}/brand/EM-PCP%20gif.gif`}
               className="absolute inset-0 h-full w-full"
               xOffset={0.5}
+              playbackRate={0.72}
             />
             <div
               className="pointer-events-none absolute inset-y-0 -left-1 hidden w-24 bg-[linear-gradient(90deg,rgba(7,9,15,1)_0%,rgba(7,9,15,0.7)_40%,rgba(7,9,15,0)_100%)] lg:block"
@@ -127,12 +151,11 @@ export default function HomePage() {
 
           <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-end">
             <ScrollReveal>
-              <p className="section-kicker mb-5">Услуги</p>
-              <h2 className="section-title leading-[1]">Четыре направления работы</h2>
+              <h2 className="section-title leading-[1]">Услуги собраны по логике объекта</h2>
             </ScrollReveal>
             <ScrollReveal className="reveal-delay-1">
               <p className="body-large max-w-[560px]">
-                Заказчику важен управляемый результат. Показываем работу как инженерный цикл: изыскания и кадастр, проектирование, строительство, авторский надзор.
+                Заказчику важно не название услуги, а управляемый результат. Показываем работу как инженерный цикл: база, сети, строительство, экспертиза, надзор.
               </p>
               <Link
                 href="/uslugi"
@@ -144,7 +167,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-16 grid gap-px bg-[#d9d6cb] sm:grid-cols-2 lg:grid-cols-4">
-            {servicePillars.map((service, index) => (
+            {homeServiceCards.map((service, index) => (
               <ScrollReveal key={service.id} className={`reveal-delay-${(index % 4) + 1}`}>
                 <Link
                   href={`/uslugi#${service.id}`}
@@ -154,7 +177,7 @@ export default function HomePage() {
                     {service.title}
                   </h3>
                   <p className="mt-5 text-[14px] leading-[1.78] text-[#626675] transition-colors duration-300 group-hover:text-white/58">
-                    {service.summary}
+                    {service.body}
                   </p>
                   <div className="mt-auto flex items-center gap-2 pt-10 text-[11px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-colors duration-300 group-hover:text-white">
                     Подробнее <Arrow />
@@ -197,38 +220,85 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── MAP PORTAL ───────────────────────────────────────── */}
-      <section className="section section-dark relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5f8b7d]/40 to-transparent" aria-hidden="true" />
+      {/* ─── PRESENTATION + KPI ───────────────────────────────── */}
+      <section className="section section-white">
+        <div className="container mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-[minmax(340px,380px)_minmax(0,760px)] lg:items-start lg:justify-between lg:gap-16 xl:grid-cols-[minmax(360px,420px)_minmax(0,720px)]">
 
-        <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
-          <ScrollReveal>
-            <div className="grid items-end gap-8 lg:grid-cols-[1fr_auto]">
-              <div>
-                <p className="overline-light mb-5">География и объекты</p>
-                <h2 className="section-title section-title-light leading-[1.02]">
-                  150+ объектов на карте
-                </h2>
-                <p className="body-large body-large-light mt-6 max-w-[560px]">
-                  Клик по метке — описание объекта: тип работ, регион, год. Фильтры и полный реестр — на отдельной странице.
-                </p>
+            {/* LEFT — A4 cover + CTA */}
+            <ScrollReveal>
+              <div className="flex flex-col items-center gap-6 lg:items-start">
+                {/* A4 portrait placeholder (empty white — to be replaced by real cover) */}
+                <div
+                  className="w-full max-w-[340px] border border-[#d9d6cb] bg-white shadow-[0_30px_80px_rgba(13,16,28,0.12)] xl:max-w-[380px]"
+                  style={{ aspectRatio: '210 / 297' }}
+                  aria-label="Обложка презентации EM-PCP, формат A4"
+                >
+                  <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`${BASE}/brand/logo-icon.svg`}
+                      alt=""
+                      width={56}
+                      height={56}
+                      className="h-14 w-14 object-contain opacity-40"
+                    />
+                    <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#626675]/50">
+                      Обложка · A4
+                    </div>
+                  </div>
+                </div>
+                <a
+                  href={brand.presentationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-primary min-h-[52px] w-full max-w-[340px] px-7 text-[12px] xl:max-w-[380px]"
+                >
+                  Смотреть презентацию
+                </a>
               </div>
-              <Link href="/karta-obektov" className="btn btn-outline-white min-h-[52px] px-7 text-[12px]">
-                Открыть полную карту
-              </Link>
-            </div>
-          </ScrollReveal>
+            </ScrollReveal>
 
-          <ScrollReveal className="reveal-delay-1">
-            <div className="mt-12 overflow-hidden border border-white/10 bg-white">
-              <iframe
-                src="https://yandex.ru/map-widget/v1/?um=constructor%3A89c572294069038bc2c5953ed69f6107017552366d8afa5c058e5fff345ca25d&source=constructor"
-                title="Карта объектов EM-PCP"
-                className="block h-[560px] w-full border-0"
-                loading="lazy"
-              />
-            </div>
-          </ScrollReveal>
+            {/* RIGHT — KPI card (150+ headline + 2×2 grid) */}
+            <ScrollReveal className="reveal-delay-1">
+              <div className="w-full border border-white/[0.08] bg-[#0d101c] text-white lg:ml-auto lg:max-w-[760px]">
+                {/* Headline */}
+                <div className="border-b border-white/[0.08] p-8 sm:p-10">
+                  <div
+                    className="font-brand font-black leading-none tabular-nums"
+                    style={{ fontSize: 'clamp(72px, 8vw, 120px)', letterSpacing: '-0.03em' }}
+                  >
+                    {portfolioKpi.headline.value.toLocaleString('ru-RU')}
+                    {portfolioKpi.headline.suffix}
+                  </div>
+                  <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-white/48">
+                    {portfolioKpi.headline.label}
+                  </div>
+                </div>
+
+                {/* 2×2 grid */}
+                <div className="grid grid-cols-2">
+                  {portfolioKpi.grid.map((kpi, i) => (
+                    <div
+                      key={kpi.label}
+                      className={`p-7 sm:p-9 ${i % 2 === 0 ? 'border-r border-white/[0.08]' : ''} ${i < 2 ? 'border-b border-white/[0.08]' : ''}`}
+                    >
+                      <div
+                        className="font-brand font-black leading-none tabular-nums"
+                        style={{ fontSize: 'clamp(34px, 3.6vw, 52px)', letterSpacing: '-0.02em' }}
+                      >
+                        {kpi.value.toLocaleString('ru-RU')}
+                        {kpi.suffix}
+                      </div>
+                      <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white/52">
+                        {kpi.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
         </div>
       </section>
 
@@ -276,85 +346,38 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── PRESENTATION + KPI ───────────────────────────────── */}
-      <section className="section section-white">
-        <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[auto_1fr] lg:items-start lg:gap-20">
+      {/* ─── MAP PORTAL ───────────────────────────────────────── */}
+      <section className="section section-dark relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5f8b7d]/40 to-transparent" aria-hidden="true" />
 
-            {/* LEFT — A4 cover + CTA */}
-            <ScrollReveal>
-              <div className="flex flex-col items-center gap-6 lg:items-start">
-                {/* A4 portrait placeholder (empty white — to be replaced by real cover) */}
-                <div
-                  className="border border-[#d9d6cb] bg-white shadow-[0_30px_80px_rgba(13,16,28,0.12)]"
-                  style={{ width: 280, aspectRatio: '210 / 297' }}
-                  aria-label="Обложка презентации EM-PCP, формат A4"
-                >
-                  <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={`${BASE}/brand/logo-icon.svg`}
-                      alt=""
-                      width={56}
-                      height={56}
-                      className="h-14 w-14 object-contain opacity-40"
-                    />
-                    <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#626675]/50">
-                      Обложка · A4
-                    </div>
-                  </div>
-                </div>
-                <a
-                  href={brand.presentationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary min-h-[52px] w-full max-w-[280px] px-7 text-[12px]"
-                >
-                  Смотреть презентацию
-                </a>
+        <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <div className="grid items-end gap-8 lg:grid-cols-[1fr_auto]">
+              <div>
+                <p className="overline-light mb-5">География и объекты</p>
+                <h2 className="section-title section-title-light leading-[1.02]">
+                  150+ объектов на карте
+                </h2>
+                <p className="body-large body-large-light mt-6 max-w-[560px]">
+                  Клик по метке — описание объекта: тип работ, регион, год. Фильтры и полный реестр — на отдельной странице.
+                </p>
               </div>
-            </ScrollReveal>
+              <Link href="/karta-obektov" className="btn btn-outline-white min-h-[52px] px-7 text-[12px]">
+                Открыть полную карту
+              </Link>
+            </div>
+          </ScrollReveal>
 
-            {/* RIGHT — KPI card (150+ headline + 2×2 grid) */}
-            <ScrollReveal className="reveal-delay-1">
-              <div className="border border-white/[0.08] bg-[#0d101c] text-white">
-                {/* Headline */}
-                <div className="border-b border-white/[0.08] p-8 sm:p-10">
-                  <div
-                    className="font-brand font-black leading-none tabular-nums"
-                    style={{ fontSize: 'clamp(72px, 8vw, 120px)', letterSpacing: '-0.03em' }}
-                  >
-                    {portfolioKpi.headline.value.toLocaleString('ru-RU')}
-                    {portfolioKpi.headline.suffix}
-                  </div>
-                  <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-white/48">
-                    {portfolioKpi.headline.label}
-                  </div>
-                </div>
-
-                {/* 2×2 grid */}
-                <div className="grid grid-cols-2">
-                  {portfolioKpi.grid.map((kpi, i) => (
-                    <div
-                      key={kpi.label}
-                      className={`p-7 sm:p-9 ${i % 2 === 0 ? 'border-r border-white/[0.08]' : ''} ${i < 2 ? 'border-b border-white/[0.08]' : ''}`}
-                    >
-                      <div
-                        className="font-brand font-black leading-none tabular-nums"
-                        style={{ fontSize: 'clamp(34px, 3.6vw, 52px)', letterSpacing: '-0.02em' }}
-                      >
-                        {kpi.value.toLocaleString('ru-RU')}
-                        {kpi.suffix}
-                      </div>
-                      <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white/52">
-                        {kpi.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
+          <ScrollReveal className="reveal-delay-1">
+            <div className="mt-12 overflow-hidden border border-white/10 bg-white">
+              <iframe
+                src="https://yandex.ru/map-widget/v1/?um=constructor%3A89c572294069038bc2c5953ed69f6107017552366d8afa5c058e5fff345ca25d&source=constructor"
+                title="Карта объектов EM-PCP"
+                className="block h-[560px] w-full border-0"
+                loading="lazy"
+              />
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 

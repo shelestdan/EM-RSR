@@ -9,6 +9,7 @@ interface Props {
   style?: React.CSSProperties
   /** objectPosition equivalent: x offset 0–1 (default 0.5 = center) */
   xOffset?: number
+  playbackRate?: number
 }
 
 /**
@@ -17,7 +18,7 @@ interface Props {
  * does NOT appear on canvas elements — only on <video> elements.
  * The actual <video> is hidden off-screen at -9999px.
  */
-export default function SilentVideo({ src, fallbackSrc, className = '', style, xOffset = 0.5 }: Props) {
+export default function SilentVideo({ src, fallbackSrc, className = '', style, xOffset = 0.5, playbackRate = 1 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -31,6 +32,7 @@ export default function SilentVideo({ src, fallbackSrc, className = '', style, x
     video.muted = true
     video.loop = true
     video.preload = 'auto'
+    video.playbackRate = playbackRate
     video.playsInline = true
     video.setAttribute('playsinline', '')
     video.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;'
@@ -111,7 +113,7 @@ export default function SilentVideo({ src, fallbackSrc, className = '', style, x
       video.pause()
       document.body.removeChild(video)
     }
-  }, [src, xOffset])
+  }, [playbackRate, src, xOffset])
 
   return (
     <>
