@@ -9,9 +9,8 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 const navLinks = [
   { href: '/uslugi', label: 'Услуги', code: '01' },
   { href: '/proekty', label: 'География и объекты', code: '02' },
-  { href: '/karta-obektov', label: 'Карта', code: '03' },
-  { href: '/o-kompanii', label: 'О компании', code: '04' },
-  { href: '/kontakty', label: 'Контакты', code: '05' },
+  { href: '/o-kompanii', label: 'О компании', code: '03' },
+  { href: '/kontakty', label: 'Контакты', code: '04' },
 ]
 
 function normalizeNavPath(value: string | null | undefined) {

@@ -285,8 +285,8 @@ export default function AboutPage() {
                 {[
                   { href: '/#contact', kicker: 'Заявка', title: 'Описать объект' },
                   { href: '/uslugi', kicker: 'Услуги', title: 'Инженерный цикл' },
-                  { href: '/proekty', kicker: 'Портфель', title: 'Проекты' },
-                  { href: '/karta-obektov', kicker: 'Карта', title: 'География объектов' },
+                  { href: '/proekty', kicker: 'География', title: 'География и объекты' },
+                  { href: '/kontakty', kicker: 'Контакты', title: 'Связаться' },
                 ].map((item) => (
                   <Link
                     key={item.href}

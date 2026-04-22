@@ -22,15 +22,6 @@ export default function ServicesPage() {
       {/* ─── HERO ──────────────────────────────────────────────── */}
       <section className="section-dark relative min-h-[60vh] overflow-hidden pt-32 flex flex-col justify-end pb-16 sm:pb-20 lg:pb-24">
         <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
-          {/* Breadcrumb */}
-          <nav className="mb-12 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/28" aria-label="Breadcrumb">
-            <Link href="/" className="transition-colors hover:text-white/60">Главная</Link>
-            <span className="text-white/16">/</span>
-            <span className="text-white/50">Услуги</span>
-          </nav>
-
-          {/* Kicker + h1 */}
-          <p className="overline-light mb-8">Инженерный цикл · EM-PCP</p>
           <h1
             className="font-brand font-black text-white max-w-[900px]"
             style={{ fontSize: 'clamp(36px, 5.5vw, 80px)', lineHeight: 0.95, letterSpacing: '-0.02em' }}

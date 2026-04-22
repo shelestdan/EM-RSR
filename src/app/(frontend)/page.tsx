@@ -362,7 +362,7 @@ export default function HomePage() {
                   Клик по метке — описание объекта: тип работ, регион, год. Фильтры и полный реестр — на отдельной странице.
                 </p>
               </div>
-              <Link href="/karta-obektov" className="btn btn-outline-white min-h-[52px] px-7 text-[12px]">
+              <Link href="/proekty" className="btn btn-outline-white min-h-[52px] px-7 text-[12px]">
                 Открыть полную карту
               </Link>
             </div>

@@ -2,7 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { mapYears, projectTypes } from '@/lib/site-data'
-import type { MapMarkerData } from './page'
+
+export interface MapMarkerData {
+  id: string
+  title: string
+  lat: number
+  lng: number
+  type: string
+  region: string
+  year: number
+  description?: string
+}
 
 // ─── TYPE GROUPING ──────────────────────────────────────────
 // Marker `type` values may be legacy keys. Group them into 4 PDF directions.

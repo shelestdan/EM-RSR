@@ -6,8 +6,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 const footerLinks = {
   pages: [
     { href: '/uslugi', label: 'Услуги' },
-    { href: '/proekty', label: 'Проекты' },
-    { href: '/karta-obektov', label: 'География и объекты' },
+    { href: '/proekty', label: 'География и объекты' },
     { href: '/o-kompanii', label: 'О компании' },
     { href: '/kontakty', label: 'Контакты' },
   ],
