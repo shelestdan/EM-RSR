@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
 const SESSION_KEY = 'portal_token'
 const INACTIVITY_LIMIT = 45 * 60 * 1000 // 45 min
 
@@ -98,7 +100,7 @@ export default function PortalDashboard() {
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative grid h-12 w-12 place-items-center border border-white/30 bg-white shadow-[0_10px_30px_rgba(0,0,0,0.24)]">
-              <Image src="/brand/logo-icon.png" alt="EM-PCP" width={36} height={36} className="h-9 w-9 object-contain" />
+              <Image src={`${BASE}/brand/logo-icon.png`} alt="EM-PCP" width={36} height={36} className="h-9 w-9 object-contain" />
             </div>
             <div>
               <div className="font-brand text-sm font-black text-white">Портал исполнителей</div>

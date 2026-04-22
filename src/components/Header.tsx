@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
 const navLinks = [
   { href: '/uslugi', label: 'Услуги', code: '01' },
   { href: '/proekty', label: 'Проекты', code: '02' },
@@ -174,7 +176,7 @@ export default function Header() {
                 className="pointer-events-none absolute inset-0 border border-[#5f8b7d]/0 transition-all duration-500 group-hover:inset-[-4px] group-hover:border-[#5f8b7d]/60"
               />
               <Image
-                src="/brand/logo-icon.svg"
+                src={`${BASE}/brand/logo-icon.svg`}
                 alt=""
                 width={40}
                 height={40}

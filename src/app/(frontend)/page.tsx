@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'EM-PCP — инженерные объекты под полную ответственность',
     description: 'Проектирование, сети, строительство, экспертиза и авторский надзор.',
-    images: [{ url: '/brand/logo.png', width: 1200, height: 630 }],
+    images: [{ url: `${BASE}/brand/logo.png`, width: 1200, height: 630 }],
   },
 }
 
@@ -293,7 +293,7 @@ export default function HomePage() {
                 >
                   <div className="flex h-full flex-col items-center justify-center gap-5 p-8 text-center">
                     <Image
-                      src="/brand/logo-icon.svg"
+                      src={`${BASE}/brand/logo-icon.svg`}
                       alt=""
                       width={56}
                       height={56}

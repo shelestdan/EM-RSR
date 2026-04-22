@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
 // Rate limiting: track attempts in sessionStorage
 const MAX_ATTEMPTS = 5
 const LOCKOUT_DURATION = 15 * 60 * 1000 // 15 min
@@ -106,7 +108,7 @@ export default function PortalLoginPage() {
           <div className="mb-4 flex justify-center">
             <div className="relative grid h-20 w-20 place-items-center border border-white/30 bg-white shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
               <Image
-                src="/brand/logo-icon.png"
+                src={`${BASE}/brand/logo-icon.png`}
                 alt="EM-PCP"
                 width={58}
                 height={58}

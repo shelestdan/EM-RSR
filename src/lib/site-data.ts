@@ -1,4 +1,5 @@
 // EM-PCP brand config. Requisites kept as «ООО «ЕМ-ПСП»»; public brand = EM-PCP.
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export const brand = {
   short: 'EM-PCP',
@@ -16,7 +17,7 @@ export const brand = {
   emailHref: 'mailto:em-psp@mail.ru',
   workingHours: 'Пн–Пт 08:00–19:00',
   sla: '≤ 4 часов в рабочее время',
-  presentationUrl: '/presentation/em-pcp-presentation.pdf',
+  presentationUrl: `${BASE}/presentation/em-pcp-presentation.pdf`,
 }
 
 export const trustBadges = [
