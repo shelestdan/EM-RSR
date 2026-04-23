@@ -78,11 +78,24 @@ export default function ContactsPage() {
             {/* Phone + MAX */}
             <ScrollReveal className="h-full">
               <div className="flex h-full flex-col justify-between gap-10 bg-white p-8 sm:p-10">
-                <div className="flex items-center gap-4">
-                  <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
-                    <PhoneIcon />
-                  </span>
-                  <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">Телефон</p>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
+                      <PhoneIcon />
+                    </span>
+                    <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">Телефон</p>
+                  </div>
+                  <a
+                    href={brand.maxHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 transition-colors hover:text-[#23273F]"
+                  >
+                    <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
+                      <MaxIcon />
+                    </span>
+                    <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">MAX</p>
+                  </a>
                 </div>
                 <div>
                   <a
@@ -91,15 +104,6 @@ export default function ContactsPage() {
                     style={{ fontSize: 'clamp(28px, 3.4vw, 42px)', letterSpacing: '-0.01em' }}
                   >
                     {brand.phone}
-                  </a>
-                  <a
-                    href={brand.maxHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 inline-flex items-center gap-2 text-[13px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-colors hover:text-[#23273F]"
-                  >
-                    <MaxIcon />
-                    Написать в MAX
                   </a>
                   <p className="mt-2 text-[14px] leading-[1.65] text-[#626675]">
                     По всем вопросам
@@ -111,17 +115,25 @@ export default function ContactsPage() {
             {/* Email */}
             <ScrollReveal className="h-full">
               <div className="flex h-full flex-col justify-between gap-10 bg-white p-8 sm:p-10">
-                <div className="flex items-center gap-4">
-                  <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
-                    <MailIcon />
-                  </span>
-                  <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">Почта</p>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
+                      <MailIcon />
+                    </span>
+                    <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">Почта</p>
+                  </div>
+                  <div className="flex items-center gap-4 opacity-0" aria-hidden="true">
+                    <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
+                      <MaxIcon />
+                    </span>
+                    <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">MAX</p>
+                  </div>
                 </div>
                 <div>
                   <a
                     href={brand.emailHref}
                     className="block font-brand font-black text-[#23273F] transition-colors hover:text-[#3E5854]"
-                    style={{ fontSize: 'clamp(24px, 2.8vw, 34px)', letterSpacing: '-0.01em' }}
+                    style={{ fontSize: 'clamp(28px, 3.4vw, 42px)', letterSpacing: '-0.01em' }}
                   >
                     {brand.email}
                   </a>
