@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import ScrollReveal from '@/components/ScrollReveal'
 import { brand, servicePillars } from '@/lib/site-data'
 import YandexMap, { type MapMarkerData } from '../karta-obektov/YandexMap'
@@ -27,15 +26,8 @@ export default async function ProjectsPage() {
     <>
       <section className="section-dark relative overflow-hidden pt-32 pb-14 sm:pb-20 lg:pb-24">
         <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
-          <nav className="mb-10 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-white/28" aria-label="Breadcrumb">
-            <Link href="/" className="transition-colors hover:text-white/60">Главная</Link>
-            <span className="text-white/16">/</span>
-            <span className="text-white/50">География и объекты</span>
-          </nav>
-
           <div className="grid gap-10 lg:grid-cols-[1.3fr_1fr] lg:items-end lg:gap-16">
             <div>
-              <p className="overline-light mb-7">География работ · EM-PCP</p>
               <h1
                 className="font-brand font-black text-white max-w-[900px]"
                 style={{ fontSize: 'clamp(34px, 5vw, 72px)', lineHeight: 0.98, letterSpacing: '-0.02em' }}
