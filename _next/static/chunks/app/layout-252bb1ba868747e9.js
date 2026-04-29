@@ -1,1 +1,0 @@
-(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[177],{3673:()=>{},6733:(e,a,l)=>{Promise.resolve().then(l.t.bind(l,8849,23)),Promise.resolve().then(l.t.bind(l,3673,23))},8849:e=>{e.exports={style:{fontFamily:"'evolventa', 'evolventa Fallback'"},className:"__className_f67d58",variable:"__variable_f67d58"}}},e=>{e.O(0,[143,441,255,358],()=>e(e.s=6733)),_N_E=e.O()}]);
