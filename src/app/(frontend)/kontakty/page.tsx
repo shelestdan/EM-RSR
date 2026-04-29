@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import LeadForm from '@/components/LeadForm'
+import OfficeMapTabs from '@/components/OfficeMapTabs'
 import ScrollReveal from '@/components/ScrollReveal'
+import CopyNumber from '@/components/CopyNumber'
 import { brand } from '@/lib/site-data'
 
 export const metadata: Metadata = {
@@ -8,12 +10,6 @@ export const metadata: Metadata = {
   description:
     'Контакты EM-PCP: телефон, MAX, email, офисы Санкт-Петербург и Краснодар, форма заявки.',
 }
-
-const Arrow = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-    <path d="M3 7h8M8 3l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
 
 const PhoneIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
@@ -25,13 +21,6 @@ const MailIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="5" width="18" height="14" rx="1" />
     <path d="m3 7 9 6 9-6" />
-  </svg>
-)
-
-const MapPinIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
-    <circle cx="12" cy="9" r="2.5" />
   </svg>
 )
 
@@ -158,53 +147,59 @@ export default function ContactsPage() {
       </section>
 
       {/* ─── FORM ──────────────────────────────────────────────── */}
-      <section id="form" className="section section-paper">
-        <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-          <div className="grid gap-12 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16 lg:items-start">
+      <section id="form" className="section section-dark relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5f8b7d]/36 to-transparent" aria-hidden="true" />
+
+        <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:gap-24 lg:items-start">
 
             <ScrollReveal>
               <h2
-                className="font-brand font-black text-[#23273F] leading-[1.02]"
-                style={{ fontSize: 'clamp(28px, 3.4vw, 46px)' }}
+                className="section-title section-title-light leading-[1.02]"
+                style={{ fontSize: 'clamp(30px, 3.8vw, 50px)' }}
               >
-                Коротко опишите объект — соберём следующий шаг
+                Расскажите, какой результат нужен — и мы найдём решение
               </h2>
-              <p className="mt-7 max-w-[460px] text-[15px] leading-[1.78] text-[#626675]">
-                Форма не заменяет ТЗ. Она помогает быстро понять контекст и подготовить предметный разговор.
+              <p className="body-large body-large-light mt-7 max-w-[460px]">
+                На основе исчерпывающих исходных данных мы точно определяем состав работ, оцениваем риски и находим решения — в том числе в нестандартных случаях, где другие видят тупик.
               </p>
 
-              <div className="mt-8 divide-y divide-[#d9d6cb]">
-                {[
-                  { title: 'Заявка', body: 'Заполняете форму или пишете на email. Честный минимум полей.' },
-                  { title: 'Разбор', body: 'Смотрим контекст, задаём 2–3 уточняющих вопроса по сути.' },
-                  { title: 'Предложение', body: 'Возвращаемся с составом работ, сроками и стоимостью.' },
-                ].map(({ title, body }) => (
-                  <div key={title} className="py-5">
-                    <p className="font-brand text-[16px] font-black text-[#23273F]">{title}</p>
-                    <p className="mt-1.5 text-[14px] leading-[1.65] text-[#626675]">{body}</p>
+              <div className="mt-12">
+                {([
+                  { label: 'Телефон', value: brand.phone, href: brand.phoneHref },
+                  { label: 'MAX', value: 'Написать в MAX', href: brand.maxHref, external: true },
+                  { label: 'Email', value: brand.email, href: brand.emailHref },
+                  { label: 'Режим работы', value: brand.workingHours, href: null },
+                ] as { label: string; value: string; href: string | null; external?: boolean }[]).map(({ label, value, href, external }) => (
+                  <div key={label} className="flex items-start gap-4 border-t border-white/[0.08] py-5">
+                    <div>
+                      <div className="mb-1 text-[9px] font-black uppercase tracking-[0.2em] text-white/24">
+                        {label}
+                      </div>
+                      {href ? (
+                        <a
+                          href={href}
+                          target={external ? '_blank' : undefined}
+                          rel={external ? 'noopener noreferrer' : undefined}
+                          className="text-[15px] font-medium text-white/72 transition-colors hover:text-white"
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        <p className="text-[15px] text-white/56">{value}</p>
+                      )}
+                    </div>
                   </div>
                 ))}
-              </div>
-
-              <div className="mt-8 border-l-[3px] border-[#3E5854] bg-white px-6 py-5">
-                <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#3E5854]">Не любите формы?</p>
-                <p className="text-[14px] leading-[1.7] text-[#23273F]">
-                  Напишите на <a href={brand.emailHref} className="font-bold underline decoration-[#3E5854]/40 underline-offset-2 hover:text-[#3E5854]">{brand.email}</a> или позвоните <a href={brand.phoneHref} className="font-bold underline decoration-[#3E5854]/40 underline-offset-2 hover:text-[#3E5854]">{brand.phone}</a>.
-                </p>
               </div>
             </ScrollReveal>
 
             <ScrollReveal className="reveal-delay-2">
-              <div className="border border-[#d9d6cb] bg-white shadow-[0_30px_90px_rgba(13,16,28,0.08)]">
-                <div className="p-7 sm:p-10">
-                  <h3 className="font-brand text-[22px] font-black leading-tight text-[#23273F]">
-                    Получить инженерную оценку
-                  </h3>
-                  <p className="mt-3 text-[14px] leading-[1.7] text-[#626675]">
-                    Ответим по существу и без скриптов.
-                  </p>
-                  <LeadForm source="contacts" className="mt-8" />
-                </div>
+              <div className="border border-white/10 bg-[#0d101c]/70 p-7 sm:p-10">
+                <h3 className="mb-8 font-brand text-[20px] font-black text-white">
+                  Получить коммерческое предложение
+                </h3>
+                <LeadForm source="contacts" dark />
               </div>
             </ScrollReveal>
           </div>
@@ -224,65 +219,7 @@ export default function ContactsPage() {
             </div>
           </ScrollReveal>
 
-          <div className="grid gap-px bg-[#d9d6cb] lg:grid-cols-[1fr_1.2fr]">
-            <ScrollReveal className="h-full">
-              <div className="flex h-full flex-col gap-px bg-[#d9d6cb]">
-                {/* SPB */}
-                <div className="flex-1 bg-[#f6f5f1] p-7 sm:p-9">
-                  <div className="flex items-center gap-3">
-                    <span className="inline-grid h-10 w-10 place-items-center border border-[#d9d6cb] bg-white text-[#3E5854]">
-                      <MapPinIcon />
-                    </span>
-                    <div>
-                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#626675]/60">Основной офис</p>
-                      <p className="mt-1 font-brand text-[13px] font-black tracking-[0.14em] text-[#23273F]">САНКТ-ПЕТЕРБУРГ</p>
-                    </div>
-                  </div>
-                  <p className="mt-6 text-[15px] font-semibold leading-[1.7] text-[#23273F]">
-                    199178, линия 9-Я В.О., д. 66 лит. А,<br />пом. 1-н, оф. 8
-                  </p>
-                </div>
-
-                {/* Krasnodar — Дополнительный офис */}
-                <div className="flex-1 bg-[#23273F] p-7 text-white sm:p-9">
-                  <div className="flex items-center gap-3">
-                    <span className="inline-grid h-10 w-10 place-items-center border border-white/14 bg-white/5 text-[#8ab0a3]">
-                      <MapPinIcon />
-                    </span>
-                    <div>
-                      <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#5f8b7d]">Дополнительный офис</p>
-                      <p className="mt-1 font-brand text-[13px] font-black tracking-[0.14em] text-white">КРАСНОДАР</p>
-                    </div>
-                  </div>
-                  <p className="mt-6 text-[15px] font-semibold leading-[1.7] text-white">
-                    350000, ул. Коммунаров, 76,<br />офис 382/9
-                  </p>
-                  <a
-                    href="https://yandex.ru/maps/?ll=38.975300%2C45.035500&z=16&pt=38.975300,45.035500"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group mt-6 inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.18em] text-[#8ab0a3] transition-all hover:gap-5 hover:text-white"
-                  >
-                    Открыть в Яндекс.Картах <Arrow />
-                  </a>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* Map */}
-            <ScrollReveal className="h-full">
-              <div className="relative h-full min-h-[440px] overflow-hidden bg-white">
-                <iframe
-                  title="Офис EM-PCP в Краснодаре"
-                  src="https://yandex.ru/map-widget/v1/?ll=38.975300%2C45.035500&z=15&pt=38.975300,45.035500,pm2rdm"
-                  style={{ minHeight: 440, border: 0, width: '100%', height: '100%' }}
-                  allowFullScreen
-                  loading="lazy"
-                  className="absolute inset-0"
-                />
-              </div>
-            </ScrollReveal>
-          </div>
+          <OfficeMapTabs />
         </div>
       </section>
 
@@ -290,17 +227,28 @@ export default function ContactsPage() {
       <section id="legal" className="border-y border-[#d9d6cb] bg-[#f6f5f1] py-12 sm:py-14">
         <div className="container mx-auto px-5 sm:px-6 lg:px-8">
           <div className="grid gap-px bg-[#d9d6cb] md:grid-cols-2 lg:grid-cols-4">
-            {[
-              ['Наименование', brand.legalName],
-              ['ИНН', brand.inn],
-              ['КПП', brand.kpp],
-              ['Генеральный директор', brand.director],
-            ].map(([label, value]) => (
-              <div key={label} className="bg-white px-6 py-5">
-                <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#626675]/50">{label}</p>
-                <p className="mt-2 font-brand text-[15px] font-black tracking-[-0.01em] text-[#23273F]">{value}</p>
-              </div>
-            ))}
+            <div className="bg-white px-6 py-5">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#626675]/50">Наименование</p>
+              <p className="mt-2 font-brand text-[15px] font-black tracking-[-0.01em] text-[#23273F]">{brand.legalName}</p>
+            </div>
+            <div className="bg-white px-6 py-5">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#626675]/50">ИНН</p>
+              <CopyNumber
+                value={brand.inn}
+                className="mt-2 font-brand text-[15px] font-black tracking-[-0.01em] text-[#23273F] tabular-nums"
+              />
+            </div>
+            <div className="bg-white px-6 py-5">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#626675]/50">КПП</p>
+              <CopyNumber
+                value={brand.kpp}
+                className="mt-2 font-brand text-[15px] font-black tracking-[-0.01em] text-[#23273F] tabular-nums"
+              />
+            </div>
+            <div className="bg-white px-6 py-5">
+              <p className="text-[9px] font-black uppercase tracking-[0.22em] text-[#626675]/50">Генеральный директор</p>
+              <p className="mt-2 font-brand text-[15px] font-black tracking-[-0.01em] text-[#23273F]">{brand.director}</p>
+            </div>
           </div>
         </div>
       </section>

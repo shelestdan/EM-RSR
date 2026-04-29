@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import LeadForm from '@/components/LeadForm'
 import ScrollReveal from '@/components/ScrollReveal'
-import { servicePillars, workflow } from '@/lib/site-data'
+import { brand, servicePillars, workflow } from '@/lib/site-data'
 
 export const metadata: Metadata = {
   title: 'Услуги — ЕМ-ПСП',
   description:
-    'Изыскания, проектирование, инженерные сети, строительство, экспертиза и авторский надзор для объектов капитального строительства.',
+    'Изыскания, проектирование, инженерные сети, экспертиза и авторский надзор для объектов капитального строительства.',
 }
 
 const Arrow = () => (
@@ -15,6 +15,9 @@ const Arrow = () => (
     <path d="M3 8h10M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
+
+const COORDINATOR_NOTE =
+  'Задача затрагивает несколько разделов? Назначаем единого координатора и фиксируем зоны ответственности в договоре.'
 
 export default function ServicesPage() {
   return (
@@ -29,10 +32,10 @@ export default function ServicesPage() {
             Не набор услуг —<br />управляемая<br />система работ
           </h1>
           <p className="mt-10 max-w-[600px] text-[15px] leading-[1.75] text-white/50 sm:text-[17px]">
-            EM-PCP закрывает ключевые этапы инженерного объекта: от исходных данных до строительства, экспертизы и авторского надзора.
+            ЕМ-ПСП закрывает ключевые этапы инженерного объекта: от исходных данных до строительства, экспертизы и авторского надзора.
           </p>
 
-          {/* Service quick-links */}
+          {/* Service quick-links — only active pillars */}
           <div className="mt-14 flex flex-col gap-px sm:flex-row">
             {servicePillars.map((s) => (
               <a
@@ -56,8 +59,6 @@ export default function ServicesPage() {
           className={`relative overflow-hidden border-b border-[#d9d6cb] ${index % 2 === 0 ? 'bg-white' : 'bg-[#f6f5f1]'}`}
         >
           <div className="container relative mx-auto px-5 py-16 sm:px-6 lg:px-8 lg:py-24">
-
-            {/* Main grid */}
             <div className="grid gap-14 lg:grid-cols-[1fr_1fr] lg:gap-20 lg:items-start">
 
               {/* LEFT */}
@@ -80,12 +81,13 @@ export default function ServicesPage() {
                   </p>
                 </div>
 
-                <Link
-                  href="/#contact"
+                {/* CTA → form anchor on this page */}
+                <a
+                  href="#contact"
                   className="mt-10 inline-flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-all duration-200 hover:gap-5 hover:text-[#23273F]"
                 >
-                  Обсудить задачу <Arrow />
-                </Link>
+                  Оставить заявку <Arrow />
+                </a>
               </ScrollReveal>
 
               {/* RIGHT — scope */}
@@ -95,24 +97,21 @@ export default function ServicesPage() {
                     Состав работ
                   </p>
                   <ul className="space-y-0">
-                    {service.scope.map((item, i) => (
+                    {service.scope.map((item) => (
                       <li
                         key={item}
-                        className="flex items-start gap-5 border-b border-[#d9d6cb] py-5 last:border-b-0"
+                        className="border-b border-[#d9d6cb] py-5 last:border-b-0"
                       >
-                        <span className="mt-0.5 shrink-0 text-[10px] font-black tabular-nums text-[#3E5854]">
-                          {String(i + 1).padStart(2, '0')}
-                        </span>
                         <span className="text-[15px] leading-[1.65] text-[#23273F]">{item}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Dark CTA strip */}
+                {/* Dark coordinator note — unified across all service blocks */}
                 <div className="mt-3 bg-[#23273F] px-7 py-6 sm:px-10 sm:py-7">
-                  <p className="text-[13px] leading-[1.75] text-white/52">
-                    Задача лежит между разделами? Мы не дробим ответственность — сначала определяем инженерную логику, затем состав договора.
+                  <p className="text-[14px] leading-[1.72] text-white/60">
+                    {COORDINATOR_NOTE}
                   </p>
                 </div>
               </ScrollReveal>
@@ -121,16 +120,13 @@ export default function ServicesPage() {
         </section>
       ))}
 
-      {/* ─── WORKFLOW ──────────────────────────────────────────── */}
+      {/* ─── WORKFLOW (copied from homepage, updated) ──────────── */}
       <section className="section section-paper">
         <div className="container mx-auto px-5 sm:px-6 lg:px-8">
 
           <ScrollReveal>
             <div className="grid gap-8 border-b border-[#d9d6cb] pb-14 lg:grid-cols-[1fr_1fr] lg:items-end">
-              <div>
-                <p className="section-kicker mb-5">Как работаем</p>
-                <h2 className="section-title leading-[1]">Сначала инженерная ясность, потом цена</h2>
-              </div>
+              <h2 className="section-title leading-[1]">Инженерная дисциплина вместо подрядного шума</h2>
               <p className="body-large max-w-[440px]">
                 Не используем фиктивное «от». Оцениваем по исходным данным, ограничениям площадки и требуемому результату.
               </p>
@@ -159,42 +155,62 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* ─── CTA FORM ──────────────────────────────────────────── */}
-      <section className="section section-dark relative overflow-hidden">
+      {/* ─── CONTACT (copied from homepage) ──────────────────────── */}
+      <section className="section section-dark relative overflow-hidden" id="contact">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5f8b7d]/36 to-transparent" aria-hidden="true" />
         <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
           <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:gap-24 lg:items-start">
 
             <ScrollReveal>
-              <p className="overline-light mb-8">Заявка</p>
               <h2
                 className="section-title section-title-light leading-[1.02]"
-                style={{ fontSize: 'clamp(28px, 3.5vw, 48px)' }}
+                style={{ fontSize: 'clamp(30px, 3.8vw, 50px)' }}
               >
-                Опишите объект. Мы соберём следующий шаг.
+                Расскажите, какой результат нужен — и мы найдём решение
               </h2>
-              <p className="body-large body-large-light mt-7 max-w-[400px]">
-                Не даём прайс без анализа. Состав работ и стоимость — после разбора исходных данных.
+              <p className="body-large body-large-light mt-7 max-w-[460px]">
+                На основе исчерпывающих исходных данных мы точно определяем состав работ, оцениваем риски и находим решения — в том числе в нестандартных случаях, где другие видят тупик.
               </p>
-              <div className="mt-12 border-t border-white/[0.08] pt-8">
-                <p className="mb-4 text-[9px] font-black uppercase tracking-[0.26em] text-white/20">Контакты</p>
-                <div className="space-y-3">
-                  <a href="tel:+79892888980" className="block text-[14px] text-white/50 transition-colors hover:text-white">
-                    +7 (989) 288-89-80
-                  </a>
-                  <a href="mailto:em-psp@mail.ru" className="block text-[14px] text-white/50 transition-colors hover:text-white">
-                    em-psp@mail.ru
-                  </a>
-                </div>
+
+              <div className="mt-12">
+                {([
+                  { label: 'Телефон', value: brand.phone, href: brand.phoneHref },
+                  { label: 'MAX', value: 'Написать в MAX', href: brand.maxHref, external: true },
+                  { label: 'Email', value: brand.email, href: brand.emailHref },
+                  { label: 'Режим работы', value: brand.workingHours, href: null },
+                ] as { label: string; value: string; href: string | null; external?: boolean }[]).map(({ label, value, href, external }) => (
+                  <div key={label} className="flex items-start gap-4 border-t border-white/[0.08] py-5">
+                    <div>
+                      <div className="mb-1 text-[9px] font-black uppercase tracking-[0.2em] text-white/24">
+                        {label}
+                      </div>
+                      {href ? (
+                        <a
+                          href={href}
+                          target={external ? '_blank' : undefined}
+                          rel={external ? 'noopener noreferrer' : undefined}
+                          className="text-[15px] font-medium text-white/72 transition-colors hover:text-white"
+                        >
+                          {value}
+                        </a>
+                      ) : (
+                        <p className="text-[15px] text-white/56">{value}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </ScrollReveal>
 
             <ScrollReveal className="reveal-delay-2">
               <div className="border border-white/10 bg-[#0d101c]/70 p-7 sm:p-10">
-                <h3 className="mb-8 font-brand text-[18px] font-black text-white">Оставить заявку</h3>
+                <h3 className="mb-8 font-brand text-[20px] font-black text-white">
+                  Получить коммерческое предложение
+                </h3>
                 <LeadForm source="services" dark />
               </div>
             </ScrollReveal>
+
           </div>
         </div>
       </section>

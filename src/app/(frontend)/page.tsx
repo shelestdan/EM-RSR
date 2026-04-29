@@ -4,7 +4,10 @@ import AnimatedCounter from '@/components/AnimatedCounter'
 import LeadForm from '@/components/LeadForm'
 import ScrollReveal from '@/components/ScrollReveal'
 import SilentVideo from '@/components/SilentVideo'
+import YandexMap from './karta-obektov/YandexMap'
+import { staticMarkers } from './proekty/markers-data'
 import { brand, metrics, principles, servicePillars, workflow } from '@/lib/site-data'
+import HeroAcronym from '@/components/HeroAcronym'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -15,7 +18,7 @@ const portfolioKpi = {
     { value: 524, suffix: '+', label: 'газификация' },
     { value: 80, suffix: '+', label: 'инженерные сети' },
     { value: 40, suffix: '+', label: 'авторский надзор' },
-    { value: 5, suffix: '', label: 'регионов' },
+    { value: 9, suffix: '', label: 'регионов' },
   ],
 }
 
@@ -31,7 +34,7 @@ const homeServiceCards = [
     body: 'Наружные и внутренние системы водоснабжения, канализации, газоснабжения и сопутствующей инфраструктуры.',
   },
   {
-    id: 'promyshlennoe-stroitelstvo',
+    id: 'stroitelstvo',
     title: 'Строительство и монтаж',
     body: 'СМР по проекту, контроль сроков, исполнительная документация и координация на объекте.',
   },
@@ -63,80 +66,55 @@ export default function HomePage() {
   return (
     <>
       {/* ─── HERO ─────────────────────────────────────────────── */}
-      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-[#07090f] text-white">
+      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-white">
 
         {/* ─── SPLIT BODY 60/40 ───────────────────────────── */}
         <div className="relative z-10 grid flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
 
           {/* LEFT — CONTENT */}
-          <div className="relative flex flex-col bg-[#07090f]">
-            <div className="relative flex flex-1 flex-col justify-end px-5 pb-12 pt-14 sm:px-6 sm:pb-14 sm:pt-16 lg:px-[max(2rem,calc((100vw-1280px)/2+2rem))] lg:pb-20 lg:pt-20">
-
-              {/* H1 */}
-              <h1
-                className="font-brand font-black leading-[0.95] text-white [text-wrap:balance]"
-                style={{ fontSize: 'clamp(36px, 4.6vw, 72px)', letterSpacing: '-0.02em' }}
-              >
-                Инженерные объекты под{' '}
-                <span className="relative inline-block text-[#8ab0a3] whitespace-nowrap">
-                  один контур
-                  <span
-                    aria-hidden="true"
-                    className="pointer-events-none absolute -bottom-[0.08em] left-0 right-0 h-[0.055em] bg-[#5f8b7d]/70"
-                  />
-                </span>
-              </h1>
-
-              {/* Subtitle */}
-              <p className="mt-10 max-w-[520px] text-[15px] leading-[1.72] text-white/62 sm:mt-12 sm:text-[17px]">
-                Изыскания, проект, экспертиза, строительство и надзор — один контрагент, управляемые сроки, точная цена.
-              </p>
-
+          <div className="relative flex flex-col bg-white">
+            <div className="relative flex flex-1 flex-col justify-center px-5 pb-10 pt-12 sm:px-8 sm:pb-12 sm:pt-14 lg:px-10 lg:pb-16 lg:pt-16 xl:px-14">
+              <HeroAcronym />
             </div>
           </div>
 
-          {/* RIGHT — VIDEO (40%) */}
-          <div className="relative order-first min-h-[42vh] overflow-hidden border-b border-white/[0.08] bg-[#0a0d15] lg:order-none lg:min-h-0 lg:border-b-0 lg:border-l">
-            <SilentVideo
-              src={`${BASE}/brand/em-pcp-web.mp4`}
-              fallbackSrc={`${BASE}/brand/EM-PCP%20gif.gif`}
-              className="absolute inset-0 h-full w-full"
-              xOffset={0.5}
-              playbackRate={0.72}
-            />
-            <div
-              className="pointer-events-none absolute inset-y-0 -left-1 hidden w-24 bg-[linear-gradient(90deg,rgba(7,9,15,1)_0%,rgba(7,9,15,0.7)_40%,rgba(7,9,15,0)_100%)] lg:block"
-              aria-hidden="true"
-            />
-            <div className="pointer-events-none absolute inset-0 bg-[#07090f]/22" aria-hidden="true" />
-            <div
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-[linear-gradient(0deg,rgba(7,9,15,0.9)_0%,transparent_100%)]"
-              aria-hidden="true"
-            />
-            <div
-              className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-[linear-gradient(180deg,rgba(7,9,15,0.7)_0%,transparent_100%)] lg:hidden"
-              aria-hidden="true"
-            />
+          {/* RIGHT — VIDEO (40%)
+               ─ Белый фон, нет паддингов, видео на всю колонку
+               ─ fit="contain" + bg-white = нет чёрных полей даже при несоответствии пропорций
+               ─ После получения кадрированного ассета заменить src ниже:
+                   src={`${BASE}/brand/hero-ref.mp4`}  →  src={`${BASE}/brand/<NEW_VIDEO>.mp4`}
+          */}
+          <div className="relative order-first min-h-[45vh] overflow-hidden border-b border-[#ebe8e3] bg-white lg:order-none lg:min-h-0 lg:border-b-0 lg:border-l lg:border-[#ebe8e3]">
+            <div className="absolute inset-0 bg-white">
+              <SilentVideo
+                src={`${BASE}/brand/logo-video.mov`}
+                fallbackSrc={`${BASE}/brand/EM-PCP%20gif.gif`}
+                className="absolute inset-0 h-full w-full"
+                xOffset={0.5}
+                playbackRate={1}
+                fit="contain"
+              />
+            </div>
           </div>
         </div>
 
         {/* ─── METRICS BAND ───────────────────────────────── */}
-        <div className="relative z-10 border-t border-white/[0.08] bg-[#07090f]">
+        <div className="relative z-10 border-t border-[#d9d6cb] bg-[#f6f5f1]">
           <div className="container mx-auto grid grid-cols-2 px-5 sm:px-6 lg:grid-cols-4 lg:px-8">
             {metrics.map((metric, i) => (
               <div
                 key={metric.label}
                 className={`py-7 sm:py-8 ${i % 2 === 0 ? 'pr-4' : 'pl-4'} lg:px-6 ${
-                  i < 3 ? 'lg:border-r lg:border-white/[0.08]' : ''
-                } ${i < 2 ? 'border-r border-white/[0.08] lg:border-r-0' : ''}`}
+                  i < 3 ? 'lg:border-r lg:border-[#d9d6cb]' : ''
+                } ${i < 2 ? 'border-r border-[#d9d6cb] lg:border-r-0' : ''}`}
               >
                 <div
-                  className="font-brand font-black leading-none text-white tabular-nums"
+                  className="font-brand font-black leading-none text-[#23273F] tabular-nums"
                   style={{ fontSize: 'clamp(30px, 3.6vw, 52px)', letterSpacing: '-0.02em' }}
                 >
                   <AnimatedCounter target={metric.value} suffix={metric.suffix} />
                 </div>
-                <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-white/38">
+                <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.14em] text-[#626675]">
                   {metric.label}
                 </div>
               </div>
@@ -151,11 +129,11 @@ export default function HomePage() {
 
           <div className="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-end">
             <ScrollReveal>
-              <h2 className="section-title leading-[1]">Услуги собраны по логике объекта</h2>
+              <h2 className="section-title leading-[1.08]">Услуги собраны по логике объекта</h2>
             </ScrollReveal>
             <ScrollReveal className="reveal-delay-1">
               <p className="body-large max-w-[560px]">
-                Заказчику важно не название услуги, а управляемый результат. Показываем работу как инженерный цикл: база, сети, строительство, экспертиза, надзор.
+                Направления сгруппированы по этапам жизненного цикла объекта. Заказчику важен итог, а не внутренние названия процессов
               </p>
               <Link
                 href="/uslugi"
@@ -308,11 +286,10 @@ export default function HomePage() {
           <ScrollReveal>
             <div className="grid gap-8 border-b border-[#d9d6cb] pb-12 sm:pb-16 lg:grid-cols-[1fr_1fr] lg:items-end">
               <div>
-                <p className="section-kicker mb-5">Принципы работы</p>
-                <h2 className="section-title leading-[1]">Три правила, по которым строится работа</h2>
+                <h2 className="section-title leading-[1]">Три рабочих принципа</h2>
               </div>
               <p className="body-large max-w-[480px]">
-                Не декларации — рабочие установки, которые определяют, как устроена работа с заказчиком на каждом этапе.
+                Работаем по процессу, а не по настроению. Каждый этап регламентирован, коммуникация прозрачна, все изменения фиксируются.
               </p>
             </div>
           </ScrollReveal>
@@ -347,39 +324,21 @@ export default function HomePage() {
       </section>
 
       {/* ─── MAP PORTAL ───────────────────────────────────────── */}
-      <section className="section section-dark relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#5f8b7d]/40 to-transparent" aria-hidden="true" />
-
-        <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
-          <ScrollReveal>
-            <div className="grid items-end gap-8 lg:grid-cols-[1fr_auto]">
-              <div>
-                <p className="overline-light mb-5">География и объекты</p>
-                <h2 className="section-title section-title-light leading-[1.02]">
-                  150+ объектов на карте
-                </h2>
-                <p className="body-large body-large-light mt-6 max-w-[560px]">
-                  Клик по метке — описание объекта: тип работ, регион, год. Фильтры и полный реестр — на отдельной странице.
-                </p>
-              </div>
-              <Link href="/proekty" className="btn btn-outline-white min-h-[52px] px-7 text-[12px]">
-                Открыть полную карту
-              </Link>
-            </div>
-          </ScrollReveal>
-
-          <ScrollReveal className="reveal-delay-1">
-            <div className="mt-12 overflow-hidden border border-white/10 bg-white">
-              <iframe
-                src="https://yandex.ru/map-widget/v1/?um=constructor%3A89c572294069038bc2c5953ed69f6107017552366d8afa5c058e5fff345ca25d&source=constructor"
-                title="Карта объектов EM-PCP"
-                className="block h-[560px] w-full border-0"
-                loading="lazy"
-              />
-            </div>
-          </ScrollReveal>
+      <div id="map-section">
+        {/* Button row */}
+        <div className="border-b border-[#d9d6cb] bg-white">
+          <div className="container mx-auto flex items-center px-5 py-5 sm:px-6 lg:px-8">
+            <Link
+              href="/proekty"
+              className="btn btn-primary min-h-[44px] px-6 text-[11px]"
+            >
+              Полный список объектов с фильтрами
+            </Link>
+          </div>
         </div>
-      </section>
+        {/* Same map as Geography & Objects page */}
+        <YandexMap initialMarkers={staticMarkers} showFilters={false} />
+      </div>
 
       {/* ─── CONTACT ──────────────────────────────────────────── */}
       <section className="section section-dark relative overflow-hidden" id="contact">
@@ -389,7 +348,6 @@ export default function HomePage() {
           <div className="grid gap-16 lg:grid-cols-[1fr_1.1fr] lg:gap-24 lg:items-start">
 
             <ScrollReveal>
-              <p className="overline-light mb-8">Контакт</p>
               <h2
                 className="section-title section-title-light leading-[1.02]"
                 style={{ fontSize: 'clamp(30px, 3.8vw, 50px)' }}
@@ -434,7 +392,7 @@ export default function HomePage() {
             <ScrollReveal className="reveal-delay-2">
               <div className="border border-white/10 bg-[#0d101c]/70 p-7 sm:p-10">
                 <h3 className="mb-8 font-brand text-[20px] font-black text-white">
-                  Оставить заявку
+                  Получить коммерческое предложение
                 </h3>
                 <LeadForm source="homepage" dark />
               </div>

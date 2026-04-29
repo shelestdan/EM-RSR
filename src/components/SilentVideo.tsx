@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   src: string
@@ -10,6 +10,7 @@ interface Props {
   /** objectPosition equivalent: x offset 0–1 (default 0.5 = center) */
   xOffset?: number
   playbackRate?: number
+  fit?: 'cover' | 'contain'
 }
 
 /**
@@ -18,8 +19,17 @@ interface Props {
  * does NOT appear on canvas elements — only on <video> elements.
  * The actual <video> is hidden off-screen at -9999px.
  */
-export default function SilentVideo({ src, fallbackSrc, className = '', style, xOffset = 0.5, playbackRate = 1 }: Props) {
+export default function SilentVideo({
+  src,
+  fallbackSrc,
+  className = '',
+  style,
+  xOffset = 0.5,
+  playbackRate = 1,
+  fit = 'cover',
+}: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [videoReady, setVideoReady] = useState(false)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -59,14 +69,20 @@ export default function SilentVideo({ src, fallbackSrc, className = '', style, x
         const vh = video.videoHeight
 
         if (vw && vh) {
-          // object-cover: scale to fill, then crop with xOffset
-          const scale = Math.max(cw / vw, ch / vh)
+          const scaleBase = fit === 'contain' ? Math.min(cw / vw, ch / vh) : Math.max(cw / vw, ch / vh)
+          const scale = scaleBase
           const sw = vw * scale
           const sh = vh * scale
 
-          // xOffset 0 = left edge, 1 = right edge
-          const dx = -(sw - cw) * xOffset
-          const dy = -(sh - ch) * 0.5 // always center vertically
+          const dx =
+            fit === 'contain'
+              ? (cw - sw) * xOffset
+              : -(sw - cw) * xOffset
+          const dy =
+            fit === 'contain'
+              ? (ch - sh) * 0.5
+              : -(sh - ch) * 0.5
+          setVideoReady(true)
 
           ctx.clearRect(0, 0, cw, ch)
           ctx.drawImage(video, dx, dy, sw, sh)
@@ -84,11 +100,20 @@ export default function SilentVideo({ src, fallbackSrc, className = '', style, x
       const vh = video.videoHeight
       if (!cw || !ch || !vw || !vh) return
 
-      const scale = Math.max(cw / vw, ch / vh)
+      const scaleBase = fit === 'contain' ? Math.min(cw / vw, ch / vh) : Math.max(cw / vw, ch / vh)
+      const scale = scaleBase
       const sw = vw * scale
       const sh = vh * scale
-      const dx = -(sw - cw) * xOffset
-      const dy = -(sh - ch) * 0.5
+      const dx =
+        fit === 'contain'
+          ? (cw - sw) * xOffset
+          : -(sw - cw) * xOffset
+      const dy =
+        fit === 'contain'
+          ? (ch - sh) * 0.5
+          : -(sh - ch) * 0.5
+
+      setVideoReady(true)
 
       ctx.clearRect(0, 0, cw, ch)
       ctx.drawImage(video, dx, dy, sw, sh)
@@ -98,6 +123,8 @@ export default function SilentVideo({ src, fallbackSrc, className = '', style, x
     const ro = new ResizeObserver(resize)
     ro.observe(canvas)
     video.addEventListener('loadeddata', drawFirstFrame)
+    const onError = () => setVideoReady(false)
+    video.addEventListener('error', onError)
     video.load()
 
     video.play().then(draw).catch(() => {
@@ -110,14 +137,15 @@ export default function SilentVideo({ src, fallbackSrc, className = '', style, x
       cancelAnimationFrame(raf)
       ro.disconnect()
       video.removeEventListener('loadeddata', drawFirstFrame)
+      video.removeEventListener('error', onError)
       video.pause()
       document.body.removeChild(video)
     }
-  }, [playbackRate, src, xOffset])
+  }, [fit, playbackRate, src, xOffset])
 
   return (
     <>
-      {fallbackSrc ? (
+      {fallbackSrc && !videoReady ? (
         <img
           src={fallbackSrc}
           alt=""
@@ -125,12 +153,12 @@ export default function SilentVideo({ src, fallbackSrc, className = '', style, x
           className={className}
           style={{
             ...style,
-            objectFit: 'cover',
-            objectPosition: `${xOffset * 100}% 50%`,
+            objectFit: fit,
+            objectPosition: fit === 'contain' ? '50% 50%' : `${xOffset * 100}% 50%`,
           }}
         />
       ) : null}
-      <canvas ref={canvasRef} className={className} style={style} />
+      <canvas ref={canvasRef} className={className} style={{ ...style, opacity: videoReady ? 1 : 0 }} />
     </>
   )
 }

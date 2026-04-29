@@ -1,312 +1,596 @@
 'use client'
 
+import 'leaflet/dist/leaflet.css'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { mapYears, projectTypes } from '@/lib/site-data'
+import { mapYears } from '@/lib/site-data'
 
+// ─────────────────────────────────────────────────────────────
+// DATA SCHEMA — exported so markers-data.ts stays in sync
+// ─────────────────────────────────────────────────────────────
 export interface MapMarkerData {
   id: string
   title: string
   lat: number
   lng: number
+  /** @deprecated Use `category` for new markers. Kept for backward compat. */
   type: string
+  /** New field: key of MARKER_TYPES (e.g. 'gas', 'water', 'surveys') */
+  category?: string
   region: string
   year: number
+  /** @deprecated Use `workDescription` for new markers */
   description?: string
+  // ── New popup fields ─────────────────────────────────────
+  contractType?: 'ГЕНПОДРЯД' | 'СУБПОДРЯД' | 'ПО ДОГОВОРУ' | 'В СОСТАВЕ КОМАНДЫ'
+  workDescription?: string
+  positiveConclusion?: string
+  conclusionUrl?: string
+  /** If empty, auto-generated from lat/lng */
+  yandexMapsUrl?: string
 }
 
-// ─── TYPE GROUPING ──────────────────────────────────────────
-// Marker `type` values may be legacy keys. Group them into 4 PDF directions.
-const TYPE_TO_DIRECTION: Record<string, string> = {
-  // Direct direction values
-  izyskaniya: 'izyskaniya',
-  proektirovanie: 'proektirovanie',
-  stroitelstvo: 'stroitelstvo',
-  nadzor: 'nadzor',
-  // Legacy mapping
-  capital_with_expertise: 'stroitelstvo',
-  capital_no_expertise: 'stroitelstvo',
-  water_supply: 'proektirovanie',
-  gas_supply: 'proektirovanie',
-  author_supervision: 'nadzor',
-  gasification: 'proektirovanie',
-  surveys: 'izyskaniya',
-  cadastre: 'izyskaniya',
+// ─────────────────────────────────────────────────────────────
+// MARKER TYPE CONFIG — single source of truth for:
+//   categories · filter labels · legend · icon shapes · colors
+// ─────────────────────────────────────────────────────────────
+export const MARKER_TYPES: Record<string, {
+  label: string
+  color: string | null
+  /** Geometric shape rendered as marker icon */
+  shape: 'square' | 'circleInCircle' | 'diamond' | 'document' | 'squareInSquare' | 'logo'
+  /** Whether this type appears as a public filter button */
+  publicFilter: boolean
+}> = {
+  surveys: {
+    label: 'Инженерные изыскания и кадастр',
+    color: '#2E7D32',
+    shape: 'circleInCircle',
+    publicFilter: true,
+  },
+  water: {
+    label: 'Водоснабжение',
+    color: '#00ACC1',
+    shape: 'square',
+    publicFilter: true,
+  },
+  sewer: {
+    label: 'Канализация',
+    color: '#8D6E63',
+    shape: 'square',
+    publicFilter: true,
+  },
+  gas: {
+    label: 'Газоснабжение',
+    color: '#FBC02D',
+    shape: 'square',
+    publicFilter: true,
+  },
+  electricity: {
+    label: 'Электроснабжение',
+    color: '#7E57C2',
+    shape: 'square',
+    publicFilter: true,
+  },
+  heating: {
+    label: 'Теплотрасса',
+    color: '#E53935',
+    shape: 'square',
+    publicFilter: true,
+  },
+  boiler: {
+    label: 'Котельные',
+    color: '#C62828',
+    shape: 'square',
+    publicFilter: true,
+  },
+  other: {
+    label: 'Иные объекты',
+    color: '#546E7A',
+    shape: 'square',
+    publicFilter: true,
+  },
+  authorSupervision: {
+    label: 'Авторский надзор',
+    color: '#00897B',
+    shape: 'diamond',
+    publicFilter: true,
+  },
+  support: {
+    label: 'Сопровождение',
+    color: '#37474F',
+    shape: 'document',
+    publicFilter: true,
+  },
+  office: {
+    label: 'Офисы',
+    color: null,
+    shape: 'logo',
+    publicFilter: true,
+  },
+  // Not a public filter — appears in legend only
+  combined: {
+    label: 'Комплексные проектные и изыскательские работы',
+    color: '#1565C0',
+    shape: 'squareInSquare',
+    publicFilter: false,
+  },
 }
 
-const DIRECTION_LABELS: Record<string, string> = {
-  izyskaniya: 'Инженерные изыскания и кадастр',
-  proektirovanie: 'Проектирование',
-  stroitelstvo: 'Промышленное строительство',
-  nadzor: 'Авторский надзор и сопровождение',
+// Backward-compat: map old `type` values to new category keys
+const LEGACY_TYPE_TO_CATEGORY: Record<string, string> = {
+  proektirovanie:        'combined',
+  izyskaniya:            'surveys',
+  nadzor:                'authorSupervision',
+  stroitelstvo:          'other',
+  office:                'office',
+  capital_with_expertise:'combined',
+  capital_no_expertise:  'other',
+  water_supply:          'water',
+  gas_supply:            'gas',
+  author_supervision:    'authorSupervision',
+  gasification:          'gas',
+  surveys:               'surveys',
+  cadastre:              'surveys',
 }
 
-const DIRECTION_COLORS: Record<string, string> = {
-  izyskaniya: '#5f8b7d',
-  proektirovanie: '#23273F',
-  stroitelstvo: '#3E5854',
-  nadzor: '#a37f5c',
+function categoryOf(marker: MapMarkerData): string {
+  return marker.category || LEGACY_TYPE_TO_CATEGORY[marker.type] || 'other'
 }
 
-const REGION_LABELS: Record<string, string> = {
-  krasnodar: 'Краснодарский край',
-  spb: 'Санкт-Петербург',
-  lenobl: 'Ленинградская область',
-  rostov: 'Ростовская область',
-  stavropol: 'Ставропольский край',
-  other: 'Другой регион',
+// ─────────────────────────────────────────────────────────────
+// OFFICE MARKERS
+// ─────────────────────────────────────────────────────────────
+export const OFFICE_MARKERS: MapMarkerData[] = [
+  {
+    id: 'office-spb',
+    title: 'Офис ЕМ-ПСП — Санкт-Петербург',
+    lat: 59.9393,
+    lng: 30.2663,
+    type: 'office',
+    category: 'office',
+    region: 'spb',
+    year: 2023,
+    workDescription: '199178, линия 9-Я В.О., д. 66 лит. А, пом. 1-н, оф. 8. Основной офис.',
+  },
+  {
+    id: 'office-krd',
+    title: 'Офис ЕМ-ПСП — Краснодар',
+    lat: 45.035500,
+    lng: 38.975300,
+    type: 'office',
+    category: 'office',
+    region: 'krasnodar',
+    year: 2023,
+    workDescription: '350000, ул. Коммунаров, 76, офис 382/9. Дополнительный офис.',
+  },
+]
+
+// ─────────────────────────────────────────────────────────────
+// FILTER CONFIG — built from MARKER_TYPES automatically
+// ─────────────────────────────────────────────────────────────
+const DIRECTION_FILTERS = [
+  { value: 'all', label: 'Все направления' },
+  ...Object.entries(MARKER_TYPES)
+    .filter(([, t]) => t.publicFilter)
+    .map(([key, t]) => ({ value: key, label: t.label })),
+]
+
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
+
+// ─────────────────────────────────────────────────────────────
+// ICON HTML BUILDER
+// ─────────────────────────────────────────────────────────────
+const ICON_SIZE = 20
+
+function buildIconHtml(cat: string): string {
+  const t = MARKER_TYPES[cat] || MARKER_TYPES.other
+  const color = t.color || '#546E7A'
+  const S = ICON_SIZE
+  const hover = `onmouseenter="this.style.transform='scale(1.25)'" onmouseleave="this.style.transform='scale(1)'"`
+
+  if (cat === 'office') {
+    return `<div style="
+        display:inline-flex;align-items:center;justify-content:center;
+        background:#fff;width:38px;height:38px;border-radius:3px;
+        border:2px solid #23273F;
+        box-shadow:0 4px 16px rgba(13,16,28,.45);
+        cursor:pointer;transition:transform .15s ease;transform-origin:bottom center;
+        position:relative;transform:translate(-50%,-100%);"
+      onmouseenter="this.style.transform='translate(-50%,-100%) scale(1.1)'"
+      onmouseleave="this.style.transform='translate(-50%,-100%) scale(1)'">
+      <img src="${BASE}/brand/logo-icon.svg" width="22" height="22" style="display:block;" alt="ЕМ-ПСП" />
+    </div>`
+  }
+
+  if (t.shape === 'circleInCircle') {
+    return `<div style="
+        width:${S}px;height:${S}px;border-radius:50%;background:${color};
+        box-shadow:0 2px 8px rgba(0,0,0,.35);
+        display:flex;align-items:center;justify-content:center;
+        transition:transform .15s;cursor:pointer;" ${hover}>
+      <div style="width:7px;height:7px;border-radius:50%;background:#fff;"></div>
+    </div>`
+  }
+
+  if (t.shape === 'diamond') {
+    return `<div style="
+        width:${S}px;height:${S}px;display:flex;align-items:center;justify-content:center;
+        cursor:pointer;transition:transform .15s;" ${hover}>
+      <div style="width:13px;height:13px;background:${color};transform:rotate(45deg);
+        box-shadow:0 2px 8px rgba(0,0,0,.35);"></div>
+    </div>`
+  }
+
+  if (t.shape === 'document') {
+    return `<div style="
+        width:${S}px;height:${S}px;display:flex;align-items:center;justify-content:center;
+        cursor:pointer;transition:transform .15s;" ${hover}>
+      <div style="width:11px;height:15px;background:${color};border-radius:1px;
+        box-shadow:0 2px 8px rgba(0,0,0,.35);"></div>
+    </div>`
+  }
+
+  if (t.shape === 'squareInSquare') {
+    return `<div style="
+        width:${S}px;height:${S}px;display:flex;align-items:center;justify-content:center;
+        cursor:pointer;transition:transform .15s;" ${hover}>
+      <div style="width:16px;height:16px;border:2.5px solid ${color};
+        display:flex;align-items:center;justify-content:center;
+        box-shadow:0 2px 8px rgba(0,0,0,.25);">
+        <div style="width:6px;height:6px;background:${color};"></div>
+      </div>
+    </div>`
+  }
+
+  // Default: square
+  return `<div style="
+      width:${S}px;height:${S}px;background:${color};
+      border-radius:2px;box-shadow:0 2px 8px rgba(0,0,0,.35);
+      cursor:pointer;transition:transform .15s;" ${hover}></div>`
 }
 
+// ─────────────────────────────────────────────────────────────
+// POPUP CSS
+// ─────────────────────────────────────────────────────────────
+const POPUP_STYLES = `
+.leaflet-popup-content-wrapper {
+  border-radius: 0 !important;
+  border: 1px solid #d9d6cb !important;
+  box-shadow: 0 24px 50px rgba(13,16,28,.18) !important;
+  padding: 0 !important;
+}
+.leaflet-popup-content { margin: 0 !important; line-height: 1 !important; }
+.leaflet-popup-tip-container { display: none !important; }
+.em-popup { padding: 16px 18px; font-family: inherit; min-width: 240px; max-width: 300px; }
+.em-popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
+.em-popup-contract { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.em-popup-year { font-size: 11px; font-weight: 700; color: #626675; white-space: nowrap; }
+.em-popup-title { font-size: 13px; font-weight: 800; line-height: 1.38; color: #23273F; margin-bottom: 7px; }
+.em-popup-desc { font-size: 11px; line-height: 1.55; color: #626675; margin-bottom: 7px; }
+.em-popup-conclusion { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 7px; }
+.em-popup-conclusion-text { font-size: 11px; line-height: 1.5; color: #626675; flex: 1; }
+.em-popup-conclusion-link {
+  font-size: 11px; font-weight: 800; color: #3E5854; text-decoration: none;
+  flex-shrink: 0; padding: 2px 0; border-bottom: 1px solid #3E5854;
+  transition: color .15s;
+}
+.em-popup-conclusion-link:hover { color: #23273F; border-color: #23273F; }
+.em-popup-ymaps {
+  display: inline-block; margin-top: 10px;
+  font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: #3E5854; text-decoration: none;
+  border-bottom: 1px solid #3E5854; padding-bottom: 1px;
+  transition: color .15s;
+}
+.em-popup-ymaps:hover { color: #23273F; border-color: #23273F; }
+`
+
+// ─────────────────────────────────────────────────────────────
+// POPUP HTML BUILDER
+// ─────────────────────────────────────────────────────────────
+function buildPopupHtml(marker: MapMarkerData): string {
+  const cat = categoryOf(marker)
+  const t = MARKER_TYPES[cat] || MARKER_TYPES.other
+  const color = t.color || '#546E7A'
+  const isOffice = cat === 'office'
+
+  const ymapsUrl = marker.yandexMapsUrl ||
+    `https://yandex.ru/maps/?ll=${marker.lng},${marker.lat}&z=16&pt=${marker.lng},${marker.lat},pm2rdm`
+
+  const descText = marker.workDescription || marker.description || ''
+
+  if (isOffice) {
+    return `
+      <div class="em-popup">
+        <div class="em-popup-title">${marker.title}</div>
+        ${descText ? `<div class="em-popup-desc">${descText}</div>` : ''}
+        <a href="${ymapsUrl}" target="_blank" rel="noopener noreferrer"
+           class="em-popup-ymaps" aria-label="Открыть офис в Яндекс.Картах">
+          ОТКРЫТЬ В ЯНДЕКС.КАРТАХ →
+        </a>
+      </div>`
+  }
+
+  const headerLeft = marker.contractType
+    ? `<span class="em-popup-contract" style="color:${color}">${marker.contractType}</span>`
+    : `<span class="em-popup-contract" style="color:${color}">${t.label}</span>`
+
+  const conclusionBlock = marker.positiveConclusion
+    ? `<div class="em-popup-conclusion">
+        <span class="em-popup-conclusion-text">${marker.positiveConclusion}</span>
+        ${marker.conclusionUrl
+          ? `<a href="${marker.conclusionUrl}" target="_blank" rel="noopener noreferrer"
+               class="em-popup-conclusion-link" aria-label="Открыть заключение">↗</a>`
+          : ''}
+      </div>`
+    : ''
+
+  return `
+    <div class="em-popup">
+      <div class="em-popup-header">
+        ${headerLeft}
+        <span class="em-popup-year">${marker.year}</span>
+      </div>
+      <div class="em-popup-title">${marker.title}</div>
+      ${descText ? `<div class="em-popup-desc">${descText}</div>` : ''}
+      ${conclusionBlock}
+      <a href="${ymapsUrl}" target="_blank" rel="noopener noreferrer"
+         class="em-popup-ymaps" aria-label="Открыть объект в Яндекс.Картах">
+        ОТКРЫТЬ В ЯНДЕКС.КАРТАХ →
+      </a>
+    </div>`
+}
+
+// ─────────────────────────────────────────────────────────────
+// LEGEND SHAPE (React JSX)
+// ─────────────────────────────────────────────────────────────
+function LegendShape({ cat }: { cat: string }) {
+  const t = MARKER_TYPES[cat]
+  if (!t) return null
+  const color = t.color || '#546E7A'
+
+  if (cat === 'office') {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={`${BASE}/brand/logo-icon.svg`}
+        width={14} height={14}
+        className="block shrink-0 opacity-80"
+        alt=""
+        aria-hidden="true"
+      />
+    )
+  }
+  if (t.shape === 'circleInCircle') {
+    return (
+      <div
+        className="shrink-0 flex items-center justify-center rounded-full"
+        style={{ width: 14, height: 14, background: color }}
+        aria-hidden="true"
+      >
+        <div className="rounded-full bg-white" style={{ width: 5, height: 5 }} />
+      </div>
+    )
+  }
+  if (t.shape === 'diamond') {
+    return (
+      <div className="shrink-0 flex items-center justify-center" style={{ width: 14, height: 14 }} aria-hidden="true">
+        <div style={{ width: 9, height: 9, background: color, transform: 'rotate(45deg)' }} />
+      </div>
+    )
+  }
+  if (t.shape === 'document') {
+    return (
+      <div className="shrink-0 flex items-center justify-center" style={{ width: 14, height: 14 }} aria-hidden="true">
+        <div style={{ width: 8, height: 12, background: color, borderRadius: 1 }} />
+      </div>
+    )
+  }
+  if (t.shape === 'squareInSquare') {
+    return (
+      <div
+        className="shrink-0 flex items-center justify-center"
+        style={{ width: 14, height: 14, border: `2px solid ${color}` }}
+        aria-hidden="true"
+      >
+        <div style={{ width: 4, height: 4, background: color }} />
+      </div>
+    )
+  }
+  // Default square
+  return (
+    <div
+      className="shrink-0 rounded-[2px]"
+      style={{ width: 12, height: 12, background: color }}
+      aria-hidden="true"
+    />
+  )
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMPONENT
+// ─────────────────────────────────────────────────────────────
 interface YandexMapProps {
   initialMarkers: MapMarkerData[]
+  showFilters?: boolean
 }
 
-declare global {
-  interface Window {
-    ymaps3: any
-  }
-}
-
-function directionOf(markerType: string): string {
-  return TYPE_TO_DIRECTION[markerType] || 'proektirovanie'
-}
-
-export default function YandexMap({ initialMarkers }: YandexMapProps) {
+export default function YandexMap({ initialMarkers, showFilters = true }: YandexMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
   const markersRef = useRef<any[]>([])
+  // Always-current ref avoids stale closures in Leaflet async callbacks
+  const filterFnRef = useRef<(m: MapMarkerData) => boolean>(() => true)
 
   const [directionFilter, setDirectionFilter] = useState('all')
   const [yearFilter, setYearFilter] = useState<'all' | number>('all')
-  const [mapLoaded, setMapLoaded] = useState(false)
-  const [filteredCount, setFilteredCount] = useState(initialMarkers.length)
+  const [mapReady, setMapReady] = useState(false)
 
-  const hasFilters = directionFilter !== 'all' || yearFilter !== 'all'
+  const allMarkers = useMemo(() => [...initialMarkers, ...OFFICE_MARKERS], [initialMarkers])
 
   const filterFn = useMemo(() => {
     return (marker: MapMarkerData) => {
-      if (directionFilter !== 'all' && directionOf(marker.type) !== directionFilter) return false
+      const cat = categoryOf(marker)
+      if (cat === 'office') {
+        return directionFilter === 'all' || directionFilter === 'office'
+      }
+      if (directionFilter === 'office') return false
+      if (directionFilter !== 'all' && cat !== directionFilter) return false
       if (yearFilter !== 'all' && marker.year !== yearFilter) return false
       return true
     }
   }, [directionFilter, yearFilter])
+
+  filterFnRef.current = filterFn
 
   function resetFilters() {
     setDirectionFilter('all')
     setYearFilter('all')
   }
 
+  const hasFilters = directionFilter !== 'all' || yearFilter !== 'all'
+
+  // ─── Init map (once) ───────────────────────────────────────
   useEffect(() => {
-    const apiKey = process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY
-    if (!apiKey) return
+    if (typeof window === 'undefined' || !mapRef.current) return
+    let cancelled = false
 
-    if (window.ymaps3) {
-      setMapLoaded(true)
-      return
+    if (!document.getElementById('em-leaflet-styles')) {
+      const style = document.createElement('style')
+      style.id = 'em-leaflet-styles'
+      style.textContent = POPUP_STYLES
+      document.head.appendChild(style)
     }
 
-    const script = document.createElement('script')
-    script.src = `https://api-maps.yandex.ru/3.0/?apikey=${apiKey}&lang=ru_RU`
-    script.async = true
-    script.onload = () => {
-      window.ymaps3.ready.then(() => setMapLoaded(true))
-    }
-    document.head.appendChild(script)
+    import('leaflet').then((Lmod) => {
+      const L = (Lmod as any).default ?? Lmod
+      if (cancelled || mapInstanceRef.current || !mapRef.current) return
 
-    return () => {
-      try { document.head.removeChild(script) } catch {}
-    }
+      delete (L.Icon.Default.prototype as any)._getIconUrl
+
+      const map = L.map(mapRef.current, {
+        center: [46.5, 39.7],
+        zoom: 6,
+        zoomControl: true,
+        attributionControl: false,
+      })
+
+      L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+        {
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20,
+        },
+      ).addTo(map)
+
+      L.control.attribution({ position: 'bottomright', prefix: false }).addTo(map)
+
+      mapInstanceRef.current = map
+      setMapReady(true)
+    })
+
+    return () => { cancelled = true }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // ─── Re-render markers on filter change ────────────────────
   useEffect(() => {
-    if (!mapLoaded || !mapRef.current) return
+    if (!mapReady || !mapInstanceRef.current) return
 
-    const { YMap, YMapDefaultFeaturesLayer, YMapDefaultSchemeLayer } = window.ymaps3
-    const map = new YMap(mapRef.current, {
-      location: {
-        center: [39.7, 46.5],
-        zoom: 6,
-      },
-    })
+    import('leaflet').then((Lmod) => {
+      const L = (Lmod as any).default ?? Lmod
+      const map = mapInstanceRef.current
+      if (!map) return
 
-    map.addChild(new YMapDefaultSchemeLayer())
-    map.addChild(new YMapDefaultFeaturesLayer())
-    mapInstanceRef.current = map
-    renderMarkers()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapLoaded])
+      markersRef.current.forEach((m) => map.removeLayer(m))
+      markersRef.current = []
 
-  useEffect(() => {
-    const filtered = initialMarkers.filter(filterFn)
-    setFilteredCount(filtered.length)
-    if (!mapLoaded || !mapInstanceRef.current) return
-    renderMarkers()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [directionFilter, yearFilter, mapLoaded])
+      const filtered = allMarkers.filter(filterFnRef.current)
 
-  function renderMarkers() {
-    if (!window.ymaps3 || !mapInstanceRef.current) return
-    const { YMapMarker } = window.ymaps3
+      filtered.forEach((markerData) => {
+        const cat = categoryOf(markerData)
+        const isOffice = cat === 'office'
+        const S = ICON_SIZE
 
-    markersRef.current.forEach((marker) => {
-      try { mapInstanceRef.current.removeChild(marker) } catch {}
-    })
-    markersRef.current = []
+        const icon = L.divIcon({
+          html: buildIconHtml(cat),
+          className: '',
+          iconSize:   isOffice ? [0, 0]       : [S, S],
+          iconAnchor: isOffice ? [0, 0]       : [S / 2, S / 2],
+          popupAnchor:isOffice ? [0, -42]     : [0, -(S / 2 + 8)],
+        })
 
-    const filtered = initialMarkers.filter(filterFn)
+        const marker = L.marker([markerData.lat, markerData.lng], { icon })
+          .bindPopup(buildPopupHtml(markerData), {
+            maxWidth: 320,
+            minWidth: 240,
+            closeButton: true,
+          })
 
-    filtered.forEach((markerData) => {
-      const dir = directionOf(markerData.type)
-      const color = DIRECTION_COLORS[dir] || '#23273F'
-      const markerEl = document.createElement('button')
-      markerEl.type = 'button'
-      markerEl.title = markerData.title
-      markerEl.style.cssText = `
-        width: 22px;
-        height: 22px;
-        border-radius: 4px;
-        background: ${color};
-        border: 2px solid #ffffff;
-        box-shadow: 0 10px 24px rgba(13,16,28,0.28);
-        cursor: pointer;
-        transition: transform .16s ease, box-shadow .16s ease;
-      `
-      markerEl.addEventListener('mouseenter', () => {
-        markerEl.style.transform = 'scale(1.22)'
-        markerEl.style.boxShadow = '0 14px 30px rgba(13,16,28,0.34)'
+        marker.addTo(map)
+        markersRef.current.push(marker)
       })
-      markerEl.addEventListener('mouseleave', () => {
-        markerEl.style.transform = 'scale(1)'
-        markerEl.style.boxShadow = '0 10px 24px rgba(13,16,28,0.28)'
-      })
-      markerEl.addEventListener('click', () => {
-        markerEl.querySelector('[data-popup="true"]')?.remove()
-
-        const popup = document.createElement('div')
-        popup.dataset.popup = 'true'
-        popup.style.cssText = `
-          position: absolute;
-          bottom: 34px;
-          left: 50%;
-          z-index: 1000;
-          min-width: 260px;
-          max-width: 320px;
-          transform: translateX(-50%);
-          border: 1px solid #d9d6cb;
-          background: #ffffff;
-          padding: 14px 16px;
-          box-shadow: 0 24px 50px rgba(13,16,28,.22);
-          text-align: left;
-          color: #23273F;
-          font-family: Inter, system-ui, sans-serif;
-        `
-
-        const title = document.createElement('div')
-        title.textContent = markerData.title
-        title.style.cssText = 'font-size:14px;font-weight:800;line-height:1.35;margin-right:20px;'
-        popup.appendChild(title)
-
-        const meta = document.createElement('div')
-        meta.textContent = `${DIRECTION_LABELS[dir]} · ${REGION_LABELS[markerData.region] || markerData.region} · ${markerData.year}`
-        meta.style.cssText = 'margin-top:8px;font-size:12px;line-height:1.45;color:#626675;'
-        popup.appendChild(meta)
-
-        if (markerData.description) {
-          const desc = document.createElement('div')
-          desc.textContent = markerData.description
-          desc.style.cssText = 'margin-top:8px;font-size:12px;line-height:1.5;color:#626675;'
-          popup.appendChild(desc)
-        }
-
-        const close = document.createElement('button')
-        close.type = 'button'
-        close.textContent = '×'
-        close.style.cssText = 'position:absolute;top:5px;right:9px;border:0;background:transparent;color:#626675;cursor:pointer;font-size:18px;line-height:1;'
-        close.onclick = (ev) => { ev.stopPropagation(); popup.remove() }
-        popup.appendChild(close)
-
-        markerEl.style.position = 'relative'
-        markerEl.appendChild(popup)
-      })
-
-      const marker = new YMapMarker(
-        { coordinates: [markerData.lng, markerData.lat] },
-        markerEl
-      )
-      mapInstanceRef.current.addChild(marker)
-      markersRef.current.push(marker)
     })
-  }
-
-  const directions = projectTypes // [all + 4 directions]
+  }, [mapReady, filterFn, allMarkers])
 
   return (
-    <section className="relative bg-[#f6f5f1] pb-20">
-      {/* ─── FILTER BAR ─────────────────────────────────────── */}
-      <div className="border-b border-[#d9d6cb] bg-white">
-        <div className="container mx-auto px-5 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <section className="relative z-0 bg-[#f6f5f1] pb-20">
+      {/* ─── FILTER BAR ──────────────────────────────────────── */}
+      {showFilters && (
+        <div className="border-b border-[#d9d6cb] bg-white">
+          <div className="container mx-auto px-5 sm:px-6 lg:px-8 py-7 sm:py-9">
 
-          {/* Label row */}
-          <div className="mb-7 flex flex-wrap items-center gap-4">
-            <span className="text-[11px] font-black tracking-[0.22em] text-[#3E5854]">ФИЛЬТРЫ</span>
-            <span className="h-px flex-1 max-w-[48px] bg-[#3E5854]" />
-            <div className="ml-auto flex items-center gap-2 text-[11px]">
-              <span className="font-bold uppercase tracking-[0.14em] text-[#626675]/60">Показано</span>
-              <span className="inline-flex min-w-[44px] items-center justify-center border border-[#3E5854] bg-[#3E5854] px-3 py-1 font-brand text-[13px] font-black text-white tabular-nums">
-                {filteredCount}
-              </span>
-              <span className="font-bold uppercase tracking-[0.14em] text-[#626675]/40 hidden sm:inline">
-                из {initialMarkers.length || 0}
-              </span>
-            </div>
-          </div>
-
-          {/* Year row */}
-          <div className="mb-5">
-            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#626675]/60">Год</p>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => setYearFilter('all')}
-                className={`border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-200 ${
-                  yearFilter === 'all'
-                    ? 'border-[#23273F] bg-[#23273F] text-white'
-                    : 'border-[#d9d6cb] bg-white text-[#626675] hover:border-[#3E5854] hover:text-[#23273F]'
-                }`}
-              >
-                Все
-              </button>
-              {mapYears.map((year) => {
-                const active = yearFilter === year
-                return (
+            {/* Year filter */}
+            {directionFilter !== 'office' && (
+              <div className="mb-5">
+                <div className="flex flex-wrap gap-1.5">
                   <button
-                    key={year}
                     type="button"
-                    onClick={() => setYearFilter(year)}
-                    className={`border px-3 py-1.5 text-[11px] font-bold tabular-nums transition-all duration-200 ${
-                      active
+                    onClick={() => setYearFilter('all')}
+                    aria-pressed={yearFilter === 'all'}
+                    className={`border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] ${
+                      yearFilter === 'all'
                         ? 'border-[#23273F] bg-[#23273F] text-white'
                         : 'border-[#d9d6cb] bg-white text-[#626675] hover:border-[#3E5854] hover:text-[#23273F]'
                     }`}
                   >
-                    {year}
+                    Все
                   </button>
-                )
-              })}
-            </div>
-          </div>
+                  {mapYears.map((year) => (
+                    <button
+                      key={year}
+                      type="button"
+                      onClick={() => setYearFilter(year)}
+                      aria-pressed={yearFilter === year}
+                      className={`border px-3 py-1.5 text-[11px] font-bold tabular-nums transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] ${
+                        yearFilter === year
+                          ? 'border-[#23273F] bg-[#23273F] text-white'
+                          : 'border-[#d9d6cb] bg-white text-[#626675] hover:border-[#3E5854] hover:text-[#23273F]'
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-          {/* Direction row */}
-          <div>
-            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#626675]/60">Направление</p>
+            {/* Direction filter */}
             <div className="flex flex-wrap gap-1.5">
-              {directions.map((d) => {
+              {DIRECTION_FILTERS.map((d) => {
                 const active = directionFilter === d.value
                 return (
                   <button
                     key={d.value}
                     type="button"
-                    onClick={() => setDirectionFilter(d.value)}
-                    className={`border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-200 ${
+                    onClick={() => {
+                      setDirectionFilter(d.value)
+                      if (d.value === 'office') setYearFilter('all')
+                    }}
+                    aria-pressed={active}
+                    className={`border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] ${
                       active
                         ? 'border-[#23273F] bg-[#23273F] text-white'
                         : 'border-[#d9d6cb] bg-white text-[#626675] hover:border-[#3E5854] hover:text-[#23273F]'
@@ -317,67 +601,36 @@ export default function YandexMap({ initialMarkers }: YandexMapProps) {
                 )
               })}
             </div>
+
+            {hasFilters && (
+              <div className="mt-4 flex justify-end">
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="text-[10px] font-black uppercase tracking-[0.18em] text-[#626675] transition-colors hover:text-[#23273F] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854]"
+                >
+                  Сбросить фильтры
+                </button>
+              </div>
+            )}
           </div>
-
-          {hasFilters && (
-            <div className="mt-5 flex justify-end">
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="text-[10px] font-black uppercase tracking-[0.18em] text-[#626675] transition-colors hover:text-[#23273F]"
-              >
-                Сбросить фильтры
-              </button>
-            </div>
-          )}
         </div>
-      </div>
+      )}
 
-      {/* ─── MAP CANVAS ────────────────────────────────────── */}
+      {/* ─── MAP CANVAS ──────────────────────────────────────── */}
       <div className="container-wide mx-auto px-5 pt-10 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden border border-[#d9d6cb] bg-white shadow-[0_40px_120px_rgba(13,16,28,0.14)]">
-
-          {/* Empty states */}
-          {!process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY && (
-            <div className="absolute inset-0 z-10 grid place-items-center bg-[#f6f5f1] p-6">
-              <div className="max-w-[540px] text-center">
-                <p className="section-kicker mb-4">Локальное окружение</p>
-                <h2 className="font-brand text-[24px] font-black leading-tight text-[#23273F]">
-                  Ключ Яндекс.Карт не настроен
-                </h2>
-                <p className="mt-4 text-[14px] leading-[1.75] text-[#626675]">
-                  Добавьте <code className="rounded bg-white px-1.5 py-0.5 text-[13px] text-[#3E5854] border border-[#d9d6cb]">NEXT_PUBLIC_YANDEX_MAPS_API_KEY</code> в переменные окружения.
-                </p>
-              </div>
-            </div>
-          )}
-          {process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY && initialMarkers.length === 0 && (
-            <div className="absolute inset-0 z-10 grid place-items-center bg-[#f6f5f1] p-6">
-              <div className="max-w-[520px] text-center">
-                <p className="section-kicker mb-4">Нет маркеров</p>
-                <h2 className="font-brand text-[24px] font-black leading-tight text-[#23273F]">
-                  Объекты пока не загружены
-                </h2>
-                <p className="mt-4 text-[14px] leading-[1.75] text-[#626675]">
-                  Добавьте маркеры в админ-панели: название, координаты, направление, год, описание.
-                </p>
-              </div>
-            </div>
-          )}
-
           <div ref={mapRef} className="h-[72vh] min-h-[560px] w-full" />
         </div>
 
-        {/* Legend strip */}
-        <div className="mt-3 grid gap-px bg-[#d9d6cb] sm:grid-cols-2 lg:grid-cols-4">
-          {Object.entries(DIRECTION_LABELS).map(([key, label]) => (
-            <div key={key} className="flex items-center gap-3 bg-white px-5 py-4">
-              <span
-                className="h-3 w-3 shrink-0 rounded-[2px]"
-                style={{ background: DIRECTION_COLORS[key] }}
-                aria-hidden="true"
-              />
-              <span className="text-[12px] font-semibold leading-[1.3] text-[#23273F]">{label}</span>
+        {/* ─── LEGEND ──────────────────────────────────────── */}
+        <div className="mt-3 grid gap-px bg-[#d9d6cb] grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+          {Object.entries(MARKER_TYPES).map(([key, t]) => (
+            <div key={key} className="flex items-center gap-2.5 bg-white px-4 py-3.5">
+              <LegendShape cat={key} />
+              <span className="text-[11px] font-semibold leading-[1.3] text-[#23273F]">
+                {t.label}
+              </span>
             </div>
           ))}
         </div>

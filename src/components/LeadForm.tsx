@@ -106,6 +106,16 @@ function CheckIcon() {
   )
 }
 
+function UploadIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  )
+}
+
 function WarnIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
@@ -459,6 +469,41 @@ export default function LeadForm({ source = 'website', className = '', dark = fa
             <WarnIcon />{errors.message}
           </p>
         )}
+      </div>
+
+      {/* File upload — optional */}
+      <div className="mt-4 sm:mt-5">
+        <label className={labelClass}>
+          Прикрепите ТЗ или исходные данные{' '}
+          <span className={dark ? 'text-white/28' : 'text-[#626675]/60'}>— необязательно</span>
+        </label>
+        <div className={`border p-4 transition-colors ${dark ? 'border-white/12 bg-[#0d101c]/60' : 'border-[#d9d6cb] bg-white'}`}>
+          <label className="flex cursor-pointer items-center gap-3 group">
+            <span className={`inline-flex items-center gap-2 border px-4 py-2 text-[11px] font-black uppercase tracking-[0.12em] transition-colors ${dark ? 'border-white/20 text-white/60 group-hover:border-white/40 group-hover:text-white' : 'border-[#d9d6cb] text-[#626675] group-hover:border-[#3E5854] group-hover:text-[#23273F]'}`}>
+              <UploadIcon /> Загрузить файл
+            </span>
+            <span
+              id={`${idP}-file-label`}
+              className={`truncate max-w-[200px] text-[12px] ${dark ? 'text-white/38' : 'text-[#626675]'}`}
+            >
+              Файл не выбран
+            </span>
+            <input
+              id={`${idP}-file`}
+              name="file"
+              type="file"
+              accept=".pdf,.doc,.docx,.dwg,.xlsx,.xls,.jpg,.jpeg,.png,.zip"
+              className="sr-only"
+              onChange={(e) => {
+                const el = document.getElementById(`${idP}-file-label`)
+                if (el) el.textContent = e.target.files?.[0]?.name ?? 'Файл не выбран'
+              }}
+            />
+          </label>
+          <p className={`mt-2 text-[10px] ${dark ? 'text-white/26' : 'text-[#626675]/70'}`}>
+            PDF, DOC, DWG, XLS, JPG, ZIP — до 20 МБ
+          </p>
+        </div>
       </div>
 
       {/* Consent */}

@@ -1,27 +1,16 @@
 import type { Metadata } from 'next'
 import ScrollReveal from '@/components/ScrollReveal'
 import { brand, servicePillars } from '@/lib/site-data'
-import YandexMap, { type MapMarkerData } from '../karta-obektov/YandexMap'
+import YandexMap from '../karta-obektov/YandexMap'
+import { staticMarkers } from './markers-data'
 
 export const metadata: Metadata = {
   title: 'География и объекты — EM-PCP',
   description:
-    'Интерактивная карта выполненных объектов EM-PCP. Фильтры по направлению работ и году. 150+ объектов.',
+    'Интерактивная карта выполненных объектов EM-PCP. Фильтры по направлению работ и году. 345+ объектов с координатами.',
 }
 
-export default async function ProjectsPage() {
-  let markers: MapMarkerData[] = []
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const res = await fetch(`${baseUrl}/api/map-markers?limit=1000`, {
-      next: { revalidate: 600 },
-    })
-    if (res.ok) {
-      const data = await res.json()
-      markers = data.docs || []
-    }
-  } catch {}
-
+export default function ProjectsPage() {
   return (
     <>
       <section className="section-dark relative overflow-hidden pt-32 pb-14 sm:pb-20 lg:pb-24">
@@ -35,7 +24,7 @@ export default async function ProjectsPage() {
                 География и объекты
               </h1>
               <p className="mt-8 max-w-[600px] text-[15px] leading-[1.75] text-white/56 sm:text-[17px]">
-                Интерактивная карта реальных объектов с фильтрами по направлению работ и году. Клик по метке — описание объекта.
+                Интерактивная карта реальных объектов с фильтрами по направлению работ и году.
               </p>
             </div>
 
@@ -69,9 +58,9 @@ export default async function ProjectsPage() {
             </div>
           </ScrollReveal>
 
-          <div className="grid gap-px bg-[#d9d6cb] sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-px bg-[#d9d6cb] sm:grid-cols-2 lg:grid-cols-3">
             {servicePillars.map((pillar, i) => (
-              <ScrollReveal key={pillar.id} className={`reveal-delay-${(i % 4) + 1}`}>
+              <ScrollReveal key={pillar.id} className={`reveal-delay-${(i % 3) + 1}`}>
                 <div className="flex h-full flex-col bg-white p-8 sm:min-h-[320px] sm:p-9">
                   <h3 className="font-brand text-[22px] font-black leading-[1.15] text-[#23273F]">
                     {pillar.title}
@@ -92,7 +81,7 @@ export default async function ProjectsPage() {
       </section>
 
       <div id="map">
-        <YandexMap initialMarkers={markers} />
+        <YandexMap initialMarkers={staticMarkers} />
       </div>
     </>
   )

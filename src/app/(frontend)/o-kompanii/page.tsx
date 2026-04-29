@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import ScrollReveal from '@/components/ScrollReveal'
+import CopyNumber from '@/components/CopyNumber'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -51,19 +52,19 @@ const certDocs = [
   {
     code_full: 'ГОСТ ISO 9001-2015',
     sublabel: 'Система менеджмента качества',
-    pdfUrl: '/certs/iso-9001.pdf',
+    pdfUrl: '/certs/iso-9001-2015-projecting.pdf',
     previewUrl: '/certs/iso-9001-preview.jpg',
   },
   {
     code_full: 'ГОСТ Р ИСО 14001-2016',
     sublabel: 'Экологический менеджмент',
-    pdfUrl: '/certs/iso-14001.pdf',
+    pdfUrl: '/certs/iso-14001-2016-projecting.pdf',
     previewUrl: '/certs/iso-14001-preview.jpg',
   },
   {
     code_full: 'ГОСТ Р ИСО 45001-2020',
     sublabel: 'Охрана труда и безопасность',
-    pdfUrl: '/certs/iso-45001.pdf',
+    pdfUrl: '/certs/iso-45001-2020-projecting.pdf',
     previewUrl: '/certs/iso-45001-preview.jpg',
   },
 ]
@@ -81,7 +82,7 @@ export default function AboutPage() {
             Инжиниринговая компания полного цикла
           </h1>
           <p className="mt-10 max-w-[760px] text-[15px] leading-[1.75] text-white/58 sm:text-[17px]">
-            Изыскания, проектирование, строительство и надзор — единая управляемая цепочка. Сроки, состав работ и ответственность фиксируются в договоре.
+            Изыскания, проектирование, контроль строительства и надзор — единая управляемая цепочка. Сроки, состав работ и ответственность фиксируются в договоре.
           </p>
         </div>
       </section>
@@ -90,15 +91,8 @@ export default function AboutPage() {
       <section id="position" className="section section-white">
         <div className="container mx-auto px-5 sm:px-6 lg:px-8">
           <ScrollReveal>
-            <div className="grid gap-12 lg:grid-cols-[0.38fr_1fr] lg:gap-20 lg:items-start">
-              <h2
-                className="font-brand font-black text-[#23273F] leading-[1.0] lg:sticky lg:top-24"
-                style={{ fontSize: 'clamp(22px, 2.2vw, 34px)', letterSpacing: '-0.015em', wordBreak: 'keep-all', hyphens: 'none' }}
-              >
-                <span className="block text-[#3E5854] opacity-70" style={{ fontSize: '0.6em', letterSpacing: '0.12em' }}>ООО</span>
-                <span className="mt-2 block">«ЕМ–ПолиСпецПроект»</span>
-              </h2>
-              <p className="text-[16px] leading-[1.85] text-[#626675]">
+            <div className="flex justify-center">
+              <p className="text-[16px] leading-[1.85] text-[#626675] max-w-[860px] text-center">
                 ООО «ЕМ – ПолиСпецПроект» — инжиниринговая компания полного цикла. Мы объединяем сбор исходных данных, изыскания, проектирование, строительство и надзор в единую управляемую цепочку, обеспечивая техническое сопровождение экспертизы. Работаем по принципу одного подрядчика: фиксируем сроки, состав работ и ответственность в договоре. Наш подход: цена всегда ниже сметных нормативов Минстроя — без накруток и «воздуха»; качество превосходит требования СП, ГОСТ и СНиП — работаем с запасом надёжности; делаем правильно с первого раза — заказчики возвращаются за новыми проектами. Опыт и масштаб: 150+ реализованных объектов, 40+ регионов присутствия, команда работает с 2019 года. Ответственность подтверждена: СРО Проектирование и Изыскания, ISO 9001, 14001, 45001, максимальный электронный документооборот и рациональное использование ресурсов. Мы не предлагаем шаблонные решения «от». Стоимость, сроки и состав работ определяем после анализа объекта, исходных данных и требуемого результата. Без показной сложности: точные исходные данные, понятные решения, регулярная коммуникация и контроль изменений.
               </p>
             </div>
@@ -111,11 +105,8 @@ export default function AboutPage() {
         <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
 
           <ScrollReveal>
-            <div className="grid gap-8 pb-14 lg:grid-cols-[1fr_1fr] lg:items-end">
+            <div className="pb-14">
               <h2 className="section-title leading-[1]">Три принципа<br />инженерной дисциплины</h2>
-              <p className="body-large max-w-[460px]">
-                Не декларации, а правила, по которым решается спор на площадке, в согласовании и в договоре.
-              </p>
             </div>
           </ScrollReveal>
 
@@ -144,13 +135,8 @@ export default function AboutPage() {
         <div className="container relative mx-auto px-5 sm:px-6 lg:px-8">
 
           <ScrollReveal>
-            <div className="mb-12 grid gap-8 border-b border-[#d9d6cb] pb-12 sm:mb-14 sm:pb-14 lg:grid-cols-[1fr_1fr] lg:items-start">
+            <div className="mb-12 border-b border-[#d9d6cb] pb-12 sm:mb-14 sm:pb-14">
               <h2 className="section-title leading-[1]">Допуски и сертификаты</h2>
-              <div className="space-y-4 text-[15px] leading-[1.78] text-[#626675]">
-                <p><strong className="font-bold text-[#23273F]">ISO 45001</strong> — это не просто сертификат. Это система охраны труда и здоровья.</p>
-                <p>Мы закладываем безопасность в проект ещё на этапе документации. Это гарантирует, что наши инженерные решения минимизируют риски для строителей на площадке и эксплуатантов в будущем.</p>
-                <p>Для нас безопасность людей — приоритет. Мы соблюдаем строгие стандарты, чтобы работа выполнялась без аварий и травм.</p>
-              </div>
             </div>
           </ScrollReveal>
 
@@ -159,7 +145,7 @@ export default function AboutPage() {
             {sroDocs.map((sro) => (
               <ScrollReveal key={sro.number} className="h-full">
                 <a
-                  href="https://www.nopriz.ru/nreestr/electronnyy-reestr/"
+                  href="https://reestr.nopriz.ru/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex h-full flex-col bg-[#f6f5f1] p-7 transition-colors hover:bg-[#edecea] sm:p-10"
@@ -171,10 +157,13 @@ export default function AboutPage() {
                     </svg>
                     <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#3E5854]">{sro.tag}</p>
                   </div>
-                  <p className="mt-6 font-brand text-[20px] font-black tracking-[-0.01em] text-[#23273F] tabular-nums whitespace-nowrap overflow-hidden text-ellipsis">
-                    {sro.number}
+                  <CopyNumber
+                    value={sro.number}
+                    className="mt-6 font-brand text-[20px] font-black tracking-[-0.01em] text-[#23273F] tabular-nums"
+                  />
+                  <p className="mt-1 font-mono text-[12px] text-[#626675]/70">
+                    ИНН <CopyNumber value={sro.inn} className="font-mono text-[12px] text-[#626675]/70" />
                   </p>
-                  <p className="mt-1 font-mono text-[12px] text-[#626675]/70">ИНН {sro.inn}</p>
                   <p className="mt-4 text-[14px] leading-[1.7] text-[#626675]">{sro.body}</p>
                   <div className="mt-auto pt-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-all group-hover:gap-3">
                     Проверить в реестре НОПРИЗ <Arrow />
@@ -184,7 +173,7 @@ export default function AboutPage() {
             ))}
           </div>
 
-          {/* ISO cards — with PDF preview thumbnails */}
+          {/* ISO cards */}
           <div className="mt-3 grid gap-px bg-[#d9d6cb] md:grid-cols-3">
             {certDocs.map((cert) => (
               <ScrollReveal key={cert.code_full}>
@@ -202,7 +191,6 @@ export default function AboutPage() {
                       </h3>
                       <p className="mt-2 text-[13px] leading-[1.65] text-[#626675]">{cert.sublabel}</p>
                     </div>
-                    {/* PDF first-page thumbnail */}
                     <div className="shrink-0 w-[72px] overflow-hidden border border-[#d9d6cb] shadow-sm transition-shadow duration-300 group-hover:shadow-md">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -251,6 +239,18 @@ export default function AboutPage() {
               </div>
             </div>
           </ScrollReveal>
+
+          {/* ISO 45001 text block */}
+          <ScrollReveal>
+            <div className="mt-3 border border-[#d9d6cb] bg-[#f6f5f1] p-7 sm:p-10">
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#3E5854]">ISO 45001</p>
+              <div className="mt-5 space-y-4 text-[15px] leading-[1.78] text-[#626675]">
+                <p><strong className="font-bold text-[#23273F]">ISO 45001</strong> — это не просто сертификат. Это система охраны труда и здоровья.</p>
+                <p>Мы закладываем безопасность в проект ещё на этапе документации. Это гарантирует, что наши инженерные решения минимизируют риски для строителей на площадке и эксплуатантов в будущем.</p>
+                <p>Для нас безопасность людей — приоритет. Мы соблюдаем строгие стандарты, чтобы работа выполнялась без аварий и травм.</p>
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -265,7 +265,7 @@ export default function AboutPage() {
                 className="section-title section-title-light leading-[1.02]"
                 style={{ fontSize: 'clamp(28px, 3.5vw, 52px)' }}
               >
-                Обсудим объект,<br />договор или документы
+                Обсудим объект<br />и состав работ
               </h2>
               <p className="body-large body-large-light mt-7 max-w-[440px]">
                 Ответим по существу: состав работ, сроки, реквизиты, допуски. Без воды и маркетинговой риторики.
@@ -284,7 +284,7 @@ export default function AboutPage() {
               <div className="grid gap-px bg-white/[0.08] sm:grid-cols-2">
                 {[
                   { href: '/#contact', kicker: 'Заявка', title: 'Описать объект' },
-                  { href: '/uslugi', kicker: 'Услуги', title: 'Инженерный цикл' },
+                  { href: '/uslugi', kicker: 'Услуги', title: 'Проектирование и изыскания' },
                   { href: '/proekty', kicker: 'География', title: 'География и объекты' },
                   { href: '/kontakty', kicker: 'Контакты', title: 'Связаться' },
                 ].map((item) => (
