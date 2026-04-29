@@ -5,8 +5,9 @@ export const MapMarkers: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Карта объектов',
-    defaultColumns: ['title', 'type', 'region', 'year', 'updatedAt'],
-    description: 'Метки на интерактивной карте выполненных объектов',
+    defaultColumns: ['title', 'category', 'region', 'year', 'updatedAt'],
+    description:
+      'Заготовка будущей админки меток. Сейчас публичная карта берёт данные из staticMarkers, источник — DOCX со ссылками на Yandex constructor.',
   },
   labels: {
     singular: 'Метка на карте',
@@ -40,15 +41,48 @@ export const MapMarkers: CollectionConfig = {
     {
       name: 'type',
       type: 'select',
-      label: 'Тип объекта',
+      label: 'Legacy тип объекта',
+      options: [
+        { label: 'Проектирование', value: 'proektirovanie' },
+        { label: 'Изыскания', value: 'izyskaniya' },
+        { label: 'Авторский надзор', value: 'nadzor' },
+        { label: 'Газификация домовладений', value: 'gasification' },
+      ],
+      admin: {
+        description: 'Служебное поле для совместимости со старой схемой.',
+      },
+    },
+    {
+      name: 'category',
+      type: 'select',
+      label: 'Категория / обозначение на карте',
       required: true,
       options: [
-        { label: '🏗 Капстроительство (с экспертизой)', value: 'capital_with_expertise' },
-        { label: '🏛 Капстроительство (без экспертизы)', value: 'capital_no_expertise' },
-        { label: '💧 Водоснабжение (линейный)', value: 'water_supply' },
-        { label: '🔥 Газоснабжение (линейный)', value: 'gas_supply' },
-        { label: '👁 Авторский надзор', value: 'author_supervision' },
-        { label: '🏠 Газификация домовладений', value: 'gasification' },
+        { label: 'Проектные работы и изыскательские работы', value: 'combined' },
+        { label: 'Инженерные изыскания и кадастр', value: 'surveys' },
+        { label: 'Водоснабжение', value: 'water' },
+        { label: 'Канализация', value: 'sewer' },
+        { label: 'Газоснабжение', value: 'gas' },
+        { label: 'Электроснабжение', value: 'electricity' },
+        { label: 'Теплотрасса', value: 'heating' },
+        { label: 'Котельные', value: 'boiler' },
+        { label: 'Иные объекты', value: 'other' },
+        { label: 'Авторский надзор', value: 'authorSupervision' },
+        { label: 'Сопровождение', value: 'support' },
+      ],
+      admin: {
+        description: 'Значения и обозначения соответствуют файлу «Обозначение на карте объектов».',
+      },
+    },
+    {
+      name: 'contractType',
+      type: 'select',
+      label: 'Формат участия',
+      options: [
+        { label: 'ГЕНПОДРЯД', value: 'ГЕНПОДРЯД' },
+        { label: 'СУБПОДРЯД', value: 'СУБПОДРЯД' },
+        { label: 'ПО ДОГОВОРУ', value: 'ПО ДОГОВОРУ' },
+        { label: 'В СОСТАВЕ КОМАНДЫ', value: 'В СОСТАВЕ КОМАНДЫ' },
       ],
     },
     {
@@ -76,7 +110,31 @@ export const MapMarkers: CollectionConfig = {
     {
       name: 'description',
       type: 'textarea',
-      label: 'Описание (для всплывающего окна)',
+      label: 'Описание работ',
+      admin: {
+        description: 'Будущее поле popup: выполняемые работы.',
+      },
+    },
+    {
+      name: 'positiveConclusion',
+      type: 'textarea',
+      label: 'Положительное заключение',
+      admin: {
+        description: 'Опционально. Если пусто, в popup блок не выводится.',
+      },
+    },
+    {
+      name: 'conclusionUrl',
+      type: 'text',
+      label: 'Ссылка на заключение',
+    },
+    {
+      name: 'yandexMapsUrl',
+      type: 'text',
+      label: 'Ссылка «Открыть в Яндекс.Картах»',
+      admin: {
+        description: 'Если пусто, публичная карта сможет собрать ссылку из координат.',
+      },
     },
     {
       name: 'project',

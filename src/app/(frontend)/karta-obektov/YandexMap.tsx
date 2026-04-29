@@ -27,6 +27,11 @@ export interface MapMarkerData {
   conclusionUrl?: string
   /** If empty, auto-generated from lat/lng */
   yandexMapsUrl?: string
+  geometry?: {
+    type: 'LineString'
+    /** Source order from Yandex constructor: [lng, lat] */
+    coordinates: [number, number][]
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -41,6 +46,12 @@ export const MARKER_TYPES: Record<string, {
   /** Whether this type appears as a public filter button */
   publicFilter: boolean
 }> = {
+  combined: {
+    label: 'Проектные работы и изыскательские работы',
+    color: '#1565C0',
+    shape: 'squareInSquare',
+    publicFilter: true,
+  },
   surveys: {
     label: 'Инженерные изыскания и кадастр',
     color: '#2E7D32',
@@ -106,13 +117,6 @@ export const MARKER_TYPES: Record<string, {
     color: null,
     shape: 'logo',
     publicFilter: true,
-  },
-  // Not a public filter — appears in legend only
-  combined: {
-    label: 'Комплексные проектные и изыскательские работы',
-    color: '#1565C0',
-    shape: 'squareInSquare',
-    publicFilter: false,
   },
 }
 
@@ -545,8 +549,29 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
       filtered.forEach((markerData) => {
         const cat = categoryOf(markerData)
+        const type = MARKER_TYPES[cat] || MARKER_TYPES.other
         const isOffice = cat === 'office'
         const S = ICON_SIZE
+
+        if (markerData.geometry?.type === 'LineString' && markerData.geometry.coordinates.length > 1) {
+          const polyline = L.polyline(
+            markerData.geometry.coordinates.map(([lng, lat]) => [lat, lng]),
+            {
+              color: type.color || '#546E7A',
+              weight: 4,
+              opacity: 0.72,
+              lineCap: 'round',
+              lineJoin: 'round',
+            },
+          ).bindPopup(buildPopupHtml(markerData), {
+            maxWidth: 320,
+            minWidth: 240,
+            closeButton: true,
+          })
+
+          polyline.addTo(map)
+          markersRef.current.push(polyline)
+        }
 
         const icon = L.divIcon({
           html: buildIconHtml(cat),
