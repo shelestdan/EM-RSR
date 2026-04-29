@@ -457,11 +457,10 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
     }
   }, [directionFilters, yearFilters])
 
-  const filteredObjects = useMemo(
-    () => initialMarkers.filter(filterFn),
+  const filteredObjectCount = useMemo(
+    () => initialMarkers.filter(filterFn).length,
     [filterFn, initialMarkers],
   )
-  const filteredObjectCount = filteredObjects.length
 
   filterFnRef.current = filterFn
 
@@ -708,66 +707,6 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
               </span>
             </div>
           ))}
-        </div>
-
-        {/* ─── OBJECT LIST ───────────────────────────────────── */}
-        <div className="mt-8 border border-[#d9d6cb] bg-white">
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#d9d6cb] px-5 py-5 sm:px-6">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#626675]/60">
-                Отфильтрованная выдача
-              </p>
-              <h2 className="mt-2 font-brand text-[24px] font-black leading-tight text-[#23273F]">
-                Список объектов
-              </h2>
-            </div>
-            <div className="font-brand text-[30px] font-black leading-none text-[#3E5854] tabular-nums">
-              {filteredObjectCount}
-            </div>
-          </div>
-
-          <div className="max-h-[640px] overflow-y-auto">
-            {filteredObjects.length > 0 ? (
-              filteredObjects.map((marker, index) => {
-                const cat = categoryOf(marker)
-                const type = MARKER_TYPES[cat] || MARKER_TYPES.other
-                const description = marker.workDescription || marker.description
-
-                return (
-                  <article
-                    key={marker.id}
-                    className="grid gap-4 border-b border-[#d9d6cb] px-5 py-5 last:border-b-0 sm:grid-cols-[72px_minmax(0,1fr)_minmax(160px,220px)] sm:px-6"
-                  >
-                    <div className="font-brand text-[22px] font-black leading-none text-[#d9d6cb] tabular-nums">
-                      {String(index + 1).padStart(2, '0')}
-                    </div>
-                    <div className="min-w-0">
-                      <h3 className="text-[15px] font-bold leading-[1.45] text-[#23273F]">
-                        {marker.title}
-                      </h3>
-                      {description && (
-                        <p className="mt-2 text-[13px] leading-[1.65] text-[#626675]">
-                          {description}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap items-start gap-2 sm:justify-end">
-                      <span className="border border-[#d9d6cb] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#626675]">
-                        {marker.year}
-                      </span>
-                      <span className="border border-[#d9d6cb] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#3E5854]">
-                        {type.label}
-                      </span>
-                    </div>
-                  </article>
-                )
-              })
-            ) : (
-              <div className="px-5 py-10 text-[14px] font-semibold text-[#626675] sm:px-6">
-                Нет объектов под выбранные фильтры.
-              </div>
-            )}
-          </div>
         </div>
       </div>
     </section>
