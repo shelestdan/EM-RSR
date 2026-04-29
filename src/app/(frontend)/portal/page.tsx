@@ -102,22 +102,18 @@ export default function PortalLoginPage() {
 
   return (
     <div className="relative grid min-h-screen place-items-center overflow-hidden bg-[#121625] px-5 py-10">
-      <div className="absolute inset-0 eng-grid-overlay opacity-70" aria-hidden="true" />
       <div className="relative w-full max-w-md">
         <div className="mb-8 text-center">
           <div className="mb-4 flex justify-center">
-            <div className="relative grid h-20 w-20 place-items-center border border-white/30 bg-white shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
-              <Image
-                src={`${BASE}/brand/logo-icon.png`}
-                alt="EM-PCP"
-                width={58}
-                height={58}
-                className="h-14 w-14 object-contain"
-              />
-            </div>
+            <Image
+              src={`${BASE}/brand/logo-icon-white.svg`}
+              alt="EM-PCP"
+              width={72}
+              height={72}
+              className="h-[72px] w-[72px] object-contain"
+            />
           </div>
           <div className="font-brand text-3xl font-black leading-tight text-white">Портал исполнителей</div>
-          <div className="mt-2 text-sm text-white/46">Закрытый доступ к рабочим материалам ЕМ-ПСП</div>
         </div>
 
         <div className="border border-white/12 bg-white/[0.055] p-7 backdrop-blur-xl sm:p-8">
