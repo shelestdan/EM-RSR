@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import EngineeringDisciplineSection from '@/components/EngineeringDisciplineSection'
 import LeadForm from '@/components/LeadForm'
 import ScrollReveal from '@/components/ScrollReveal'
-import { brand, servicePillars, workflow } from '@/lib/site-data'
+import { brand, servicePillars } from '@/lib/site-data'
 
 export const metadata: Metadata = {
   title: 'Услуги — ЕМ-ПСП',
@@ -120,40 +120,8 @@ export default function ServicesPage() {
         </section>
       ))}
 
-      {/* ─── WORKFLOW (copied from homepage, updated) ──────────── */}
-      <section className="section section-paper">
-        <div className="container mx-auto px-5 sm:px-6 lg:px-8">
-
-          <ScrollReveal>
-            <div className="grid gap-8 border-b border-[#d9d6cb] pb-14 lg:grid-cols-[1fr_1fr] lg:items-end">
-              <h2 className="section-title leading-[1]">Инженерная дисциплина вместо подрядного шума</h2>
-              <p className="body-large max-w-[440px]">
-                Не используем фиктивное «от». Оцениваем по исходным данным, ограничениям площадки и требуемому результату.
-              </p>
-            </div>
-          </ScrollReveal>
-
-          <div className="mt-14 grid gap-px bg-[#d9d6cb] lg:grid-cols-3">
-            {workflow.map((step, index) => (
-              <ScrollReveal key={step.title} className={`reveal-delay-${index + 1}`}>
-                <div className="group flex h-full flex-col bg-white p-8 transition-colors duration-300 hover:bg-[#f6f5f1] sm:p-10">
-                  <div
-                    className="font-brand font-black leading-none text-[#eeece4] transition-colors duration-300 group-hover:text-[#d9d6cb]"
-                    style={{ fontSize: 'clamp(72px, 6vw, 96px)' }}
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-                  <span className="mt-8 block h-px w-10 bg-[#3E5854]" />
-                  <h3 className="mt-7 font-brand text-[24px] font-black leading-tight text-[#23273F]">
-                    {step.title}
-                  </h3>
-                  <p className="mt-5 text-[15px] leading-[1.78] text-[#626675]">{step.body}</p>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ─── WORKFLOW ──────────────────────────────────────────── */}
+      <EngineeringDisciplineSection />
 
       {/* ─── CONTACT (copied from homepage) ──────────────────────── */}
       <section className="section section-dark relative overflow-hidden" id="contact">

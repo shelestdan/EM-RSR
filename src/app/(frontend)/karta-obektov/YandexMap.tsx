@@ -422,8 +422,8 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
   // Always-current ref avoids stale closures in Leaflet async callbacks
   const filterFnRef = useRef<(m: MapMarkerData) => boolean>(() => true)
 
-  const [directionFilter, setDirectionFilter] = useState('all')
-  const [yearFilter, setYearFilter] = useState<'all' | number>('all')
+  const [directionFilters, setDirectionFilters] = useState<string[]>([])
+  const [yearFilters, setYearFilters] = useState<number[]>([])
   const [mapReady, setMapReady] = useState(false)
 
   const allMarkers = useMemo(() => [...initialMarkers, ...OFFICE_MARKERS], [initialMarkers])
@@ -431,24 +431,41 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
   const filterFn = useMemo(() => {
     return (marker: MapMarkerData) => {
       const cat = categoryOf(marker)
-      if (cat === 'office') {
-        return directionFilter === 'all' || directionFilter === 'office'
-      }
-      if (directionFilter === 'office') return false
-      if (directionFilter !== 'all' && cat !== directionFilter) return false
-      if (yearFilter !== 'all' && marker.year !== yearFilter) return false
+      if (directionFilters.length > 0 && !directionFilters.includes(cat)) return false
+      if (yearFilters.length > 0 && !yearFilters.includes(marker.year)) return false
       return true
     }
-  }, [directionFilter, yearFilter])
+  }, [directionFilters, yearFilters])
+
+  const filteredObjectCount = useMemo(
+    () => initialMarkers.filter(filterFn).length,
+    [filterFn, initialMarkers],
+  )
 
   filterFnRef.current = filterFn
 
-  function resetFilters() {
-    setDirectionFilter('all')
-    setYearFilter('all')
+  function toggleDirectionFilter(value: string) {
+    setDirectionFilters((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value],
+    )
   }
 
-  const hasFilters = directionFilter !== 'all' || yearFilter !== 'all'
+  function toggleYearFilter(year: number) {
+    setYearFilters((current) =>
+      current.includes(year)
+        ? current.filter((item) => item !== year)
+        : [...current, year],
+    )
+  }
+
+  function resetFilters() {
+    setDirectionFilters([])
+    setYearFilters([])
+  }
+
+  const hasFilters = directionFilters.length > 0 || yearFilters.length > 0
 
   // ─── Init map (once) ───────────────────────────────────────
   useEffect(() => {
@@ -542,52 +559,68 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
         <div className="border-b border-[#d9d6cb] bg-white">
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 py-7 sm:py-9">
 
+            <div className="mb-5 flex items-center gap-2">
+              <span className="h-px w-5 bg-[#d14232]" aria-hidden="true" />
+              <span className="text-[11px] font-black uppercase tracking-[0.18em] text-[#626675]/60">
+                Объектов
+              </span>
+              <span className="inline-flex min-w-[54px] items-center justify-center bg-[#3E5854] px-3 py-2 font-brand text-[16px] font-black leading-none text-white tabular-nums">
+                {filteredObjectCount}
+              </span>
+            </div>
+
             {/* Year filter */}
-            {directionFilter !== 'office' && (
-              <div className="mb-5">
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setYearFilter('all')}
-                    aria-pressed={yearFilter === 'all'}
-                    className={`border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] ${
-                      yearFilter === 'all'
-                        ? 'border-[#23273F] bg-[#23273F] text-white'
-                        : 'border-[#d9d6cb] bg-white text-[#626675] hover:border-[#3E5854] hover:text-[#23273F]'
-                    }`}
-                  >
-                    Все
-                  </button>
-                  {mapYears.map((year) => (
+            <div className="mb-5">
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setYearFilters([])}
+                  aria-pressed={yearFilters.length === 0}
+                  className={`border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] ${
+                    yearFilters.length === 0
+                      ? 'border-[#23273F] bg-[#23273F] text-white'
+                      : 'border-[#d9d6cb] bg-white text-[#626675] hover:border-[#3E5854] hover:text-[#23273F]'
+                  }`}
+                >
+                  Все
+                </button>
+                {mapYears.map((year) => {
+                  const active = yearFilters.includes(year)
+                  return (
                     <button
                       key={year}
                       type="button"
-                      onClick={() => setYearFilter(year)}
-                      aria-pressed={yearFilter === year}
+                      onClick={() => toggleYearFilter(year)}
+                      aria-pressed={active}
                       className={`border px-3 py-1.5 text-[11px] font-bold tabular-nums transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] ${
-                        yearFilter === year
+                        active
                           ? 'border-[#23273F] bg-[#23273F] text-white'
                           : 'border-[#d9d6cb] bg-white text-[#626675] hover:border-[#3E5854] hover:text-[#23273F]'
                       }`}
                     >
                       {year}
                     </button>
-                  ))}
-                </div>
+                  )
+                })}
               </div>
-            )}
+            </div>
 
             {/* Direction filter */}
             <div className="flex flex-wrap gap-1.5">
               {DIRECTION_FILTERS.map((d) => {
-                const active = directionFilter === d.value
+                const active = d.value === 'all'
+                  ? directionFilters.length === 0
+                  : directionFilters.includes(d.value)
                 return (
                   <button
                     key={d.value}
                     type="button"
                     onClick={() => {
-                      setDirectionFilter(d.value)
-                      if (d.value === 'office') setYearFilter('all')
+                      if (d.value === 'all') {
+                        setDirectionFilters([])
+                        return
+                      }
+                      toggleDirectionFilter(d.value)
                     }}
                     aria-pressed={active}
                     className={`border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] ${
