@@ -84,7 +84,7 @@ export default function HomePage() {
                ─ После получения кадрированного ассета заменить src ниже:
                    src={`${BASE}/brand/hero-ref.mp4`}  →  src={`${BASE}/brand/<NEW_VIDEO>.mp4`}
           */}
-          <div className="relative order-first min-h-[45vh] overflow-hidden border-b border-[#ebe8e3] bg-white lg:order-none lg:min-h-0 lg:border-b-0 lg:border-l lg:border-[#ebe8e3]">
+          <div className="relative order-first min-h-[45vh] overflow-hidden border-b border-[#ebe8e3] bg-white lg:order-none lg:min-h-0 lg:border-b-0">
             <div className="absolute inset-0 bg-white">
               <SilentVideo
                 src={`${BASE}/brand/logo-video.mov`}
@@ -92,7 +92,8 @@ export default function HomePage() {
                 className="absolute inset-0 h-full w-full"
                 xOffset={0.5}
                 playbackRate={1}
-                fit="contain"
+                fit="cover"
+                zoom={0.8}
               />
             </div>
           </div>
@@ -104,9 +105,7 @@ export default function HomePage() {
             {metrics.map((metric, i) => (
               <div
                 key={metric.label}
-                className={`py-7 sm:py-8 ${i % 2 === 0 ? 'pr-4' : 'pl-4'} lg:px-6 ${
-                  i < 3 ? 'lg:border-r lg:border-[#d9d6cb]' : ''
-                } ${i < 2 ? 'border-r border-[#d9d6cb] lg:border-r-0' : ''}`}
+                className={`py-7 sm:py-8 lg:px-6 ${i % 2 === 0 ? 'pr-4 lg:pr-0' : 'pl-4 lg:pl-0'}`}
               >
                 <div
                   className="font-brand font-black leading-none text-[#23273F] tabular-nums"

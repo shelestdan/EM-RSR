@@ -11,6 +11,8 @@ interface Props {
   xOffset?: number
   playbackRate?: number
   fit?: 'cover' | 'contain'
+  /** Scale multiplier: 1 = fill exactly, <1 = zoom out (show more), >1 = zoom in (crop more) */
+  zoom?: number
 }
 
 /**
@@ -27,6 +29,7 @@ export default function SilentVideo({
   xOffset = 0.5,
   playbackRate = 1,
   fit = 'cover',
+  zoom = 1,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [videoReady, setVideoReady] = useState(false)
@@ -70,7 +73,7 @@ export default function SilentVideo({
 
         if (vw && vh) {
           const scaleBase = fit === 'contain' ? Math.min(cw / vw, ch / vh) : Math.max(cw / vw, ch / vh)
-          const scale = scaleBase
+          const scale = scaleBase * zoom   // ← zoom < 1 уменьшает, zoom > 1 увеличивает
           const sw = vw * scale
           const sh = vh * scale
 
@@ -141,7 +144,7 @@ export default function SilentVideo({
       video.pause()
       document.body.removeChild(video)
     }
-  }, [fit, playbackRate, src, xOffset])
+  }, [fit, playbackRate, src, xOffset, zoom])
 
   return (
     <>
