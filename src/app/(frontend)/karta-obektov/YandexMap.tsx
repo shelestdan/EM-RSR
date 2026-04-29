@@ -118,13 +118,10 @@ export const MARKER_TYPES: Record<string, {
 
 // Backward-compat: map old `type` values to new category keys
 const LEGACY_TYPE_TO_CATEGORY: Record<string, string> = {
-  proektirovanie:        'combined',
   izyskaniya:            'surveys',
   nadzor:                'authorSupervision',
   stroitelstvo:          'other',
   office:                'office',
-  capital_with_expertise:'combined',
-  capital_no_expertise:  'other',
   water_supply:          'water',
   gas_supply:            'gas',
   author_supervision:    'authorSupervision',
@@ -133,8 +130,27 @@ const LEGACY_TYPE_TO_CATEGORY: Record<string, string> = {
   cadastre:              'surveys',
 }
 
+const CATEGORY_INFERENCE_RULES: { category: string; patterns: RegExp[] }[] = [
+  { category: 'boiler', patterns: [/котельн/i, /мку/i, /блочно-модульн/i] },
+  { category: 'gas', patterns: [/газ/i, /гсн/i, /гсв/i, /ууг/i] },
+  { category: 'water', patterns: [/водоснаб/i, /водоподготов/i, /водоочист/i, /насосн/i, /нв\b/i] },
+  { category: 'sewer', patterns: [/канализ/i, /очистн/i, /кнс/i, /сточн/i] },
+  { category: 'electricity', patterns: [/электр/i, /электроснаб/i, /эом/i, /кл\s*6/i, /кабель/i] },
+  { category: 'heating', patterns: [/отоплен/i, /теплотрас/i, /овик/i, /вентиляц/i, /тепл/i] },
+  { category: 'surveys', patterns: [/изыскан/i, /геолог/i, /геодез/i, /кадастр/i, /межеван/i, /планировк/i] },
+  { category: 'authorSupervision', patterns: [/авторск/i, /надзор/i] },
+  { category: 'support', patterns: [/сопровожд/i, /экспертиз/i, /доработк/i, /заключени/i, /согласован/i] },
+]
+
+function inferCategory(marker: MapMarkerData): string | null {
+  const source = `${marker.title} ${marker.workDescription || marker.description || ''}`
+  return CATEGORY_INFERENCE_RULES.find((rule) =>
+    rule.patterns.some((pattern) => pattern.test(source)),
+  )?.category || null
+}
+
 function categoryOf(marker: MapMarkerData): string {
-  return marker.category || LEGACY_TYPE_TO_CATEGORY[marker.type] || 'other'
+  return marker.category || LEGACY_TYPE_TO_CATEGORY[marker.type] || inferCategory(marker) || 'other'
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -174,10 +190,6 @@ const DIRECTION_FILTERS = [
     .filter(([, t]) => t.publicFilter)
     .map(([key, t]) => ({ value: key, label: t.label })),
 ]
-
-const DIRECTION_FILTER_VALUES = DIRECTION_FILTERS
-  .filter((filter) => filter.value !== 'all')
-  .map((filter) => filter.value)
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -431,25 +443,21 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
   const [mapReady, setMapReady] = useState(false)
 
   const allMarkers = useMemo(() => [...initialMarkers, ...OFFICE_MARKERS], [initialMarkers])
-  const allDirectionsSelected = DIRECTION_FILTER_VALUES.every((value) => directionFilters.includes(value))
-  const allYearsSelected = mapYears.every((year) => yearFilters.includes(year))
 
   const filterFn = useMemo(() => {
-    const hasDirectionLimit = directionFilters.length > 0 && !allDirectionsSelected
-    const hasYearLimit = yearFilters.length > 0 && !allYearsSelected
-
     return (marker: MapMarkerData) => {
       const cat = categoryOf(marker)
-      if (hasDirectionLimit && !directionFilters.includes(cat)) return false
-      if (hasYearLimit && !yearFilters.includes(marker.year)) return false
+      if (directionFilters.length > 0 && !directionFilters.includes(cat)) return false
+      if (yearFilters.length > 0 && !yearFilters.includes(marker.year)) return false
       return true
     }
-  }, [allDirectionsSelected, allYearsSelected, directionFilters, yearFilters])
+  }, [directionFilters, yearFilters])
 
-  const filteredObjectCount = useMemo(
-    () => initialMarkers.filter(filterFn).length,
+  const filteredObjects = useMemo(
+    () => initialMarkers.filter(filterFn),
     [filterFn, initialMarkers],
   )
+  const filteredObjectCount = filteredObjects.length
 
   filterFnRef.current = filterFn
 
@@ -675,6 +683,66 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
               </span>
             </div>
           ))}
+        </div>
+
+        {/* ─── OBJECT LIST ───────────────────────────────────── */}
+        <div className="mt-8 border border-[#d9d6cb] bg-white">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#d9d6cb] px-5 py-5 sm:px-6">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#626675]/60">
+                Отфильтрованная выдача
+              </p>
+              <h2 className="mt-2 font-brand text-[24px] font-black leading-tight text-[#23273F]">
+                Список объектов
+              </h2>
+            </div>
+            <div className="font-brand text-[30px] font-black leading-none text-[#3E5854] tabular-nums">
+              {filteredObjectCount}
+            </div>
+          </div>
+
+          <div className="max-h-[640px] overflow-y-auto">
+            {filteredObjects.length > 0 ? (
+              filteredObjects.map((marker, index) => {
+                const cat = categoryOf(marker)
+                const type = MARKER_TYPES[cat] || MARKER_TYPES.other
+                const description = marker.workDescription || marker.description
+
+                return (
+                  <article
+                    key={marker.id}
+                    className="grid gap-4 border-b border-[#d9d6cb] px-5 py-5 last:border-b-0 sm:grid-cols-[72px_minmax(0,1fr)_minmax(160px,220px)] sm:px-6"
+                  >
+                    <div className="font-brand text-[22px] font-black leading-none text-[#d9d6cb] tabular-nums">
+                      {String(index + 1).padStart(2, '0')}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-[15px] font-bold leading-[1.45] text-[#23273F]">
+                        {marker.title}
+                      </h3>
+                      {description && (
+                        <p className="mt-2 text-[13px] leading-[1.65] text-[#626675]">
+                          {description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-start gap-2 sm:justify-end">
+                      <span className="border border-[#d9d6cb] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#626675]">
+                        {marker.year}
+                      </span>
+                      <span className="border border-[#d9d6cb] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#3E5854]">
+                        {type.label}
+                      </span>
+                    </div>
+                  </article>
+                )
+              })
+            ) : (
+              <div className="px-5 py-10 text-[14px] font-semibold text-[#626675] sm:px-6">
+                Нет объектов под выбранные фильтры.
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
