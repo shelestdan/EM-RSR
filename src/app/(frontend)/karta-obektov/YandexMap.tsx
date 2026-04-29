@@ -175,6 +175,10 @@ const DIRECTION_FILTERS = [
     .map(([key, t]) => ({ value: key, label: t.label })),
 ]
 
+const DIRECTION_FILTER_VALUES = DIRECTION_FILTERS
+  .filter((filter) => filter.value !== 'all')
+  .map((filter) => filter.value)
+
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 // ─────────────────────────────────────────────────────────────
@@ -427,15 +431,20 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
   const [mapReady, setMapReady] = useState(false)
 
   const allMarkers = useMemo(() => [...initialMarkers, ...OFFICE_MARKERS], [initialMarkers])
+  const allDirectionsSelected = DIRECTION_FILTER_VALUES.every((value) => directionFilters.includes(value))
+  const allYearsSelected = mapYears.every((year) => yearFilters.includes(year))
 
   const filterFn = useMemo(() => {
+    const hasDirectionLimit = directionFilters.length > 0 && !allDirectionsSelected
+    const hasYearLimit = yearFilters.length > 0 && !allYearsSelected
+
     return (marker: MapMarkerData) => {
       const cat = categoryOf(marker)
-      if (directionFilters.length > 0 && !directionFilters.includes(cat)) return false
-      if (yearFilters.length > 0 && !yearFilters.includes(marker.year)) return false
+      if (hasDirectionLimit && !directionFilters.includes(cat)) return false
+      if (hasYearLimit && !yearFilters.includes(marker.year)) return false
       return true
     }
-  }, [directionFilters, yearFilters])
+  }, [allDirectionsSelected, allYearsSelected, directionFilters, yearFilters])
 
   const filteredObjectCount = useMemo(
     () => initialMarkers.filter(filterFn).length,
