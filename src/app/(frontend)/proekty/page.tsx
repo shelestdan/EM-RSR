@@ -7,7 +7,7 @@ import { staticMarkers } from './markers-data'
 export const metadata: Metadata = {
   title: 'География и объекты — EM-PCP',
   description:
-    'Интерактивная карта выполненных объектов EM-PCP. Фильтры по направлению работ и году. 345+ объектов с координатами.',
+    'Интерактивная карта выполненных объектов EM-PCP. Фильтры по направлению работ и году. 398 объектов с координатами.',
 }
 
 export default function ProjectsPage() {
