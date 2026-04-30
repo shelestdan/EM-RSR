@@ -1,7 +1,8 @@
-export const dynamic = 'force-static'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import nodemailer from 'nodemailer'
+
+export const dynamic = 'force-dynamic'
 
 const schema = z.object({
   name: z
@@ -44,7 +45,8 @@ export async function POST(req: NextRequest) {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
 
     // Save to Payload CMS via internal API
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const baseUrl =
+      process.env.PAYLOAD_INTERNAL_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     await fetch(`${baseUrl}/api/form-submissions`, {
       method: 'POST',
       headers: {

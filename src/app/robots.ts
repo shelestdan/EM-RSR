@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next'
+import { siteUrl } from '@/lib/seo'
 
 export const dynamic = 'force-static'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://em-psp.ru'
+const baseUrl = siteUrl
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -10,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/admin', '/portal', '/api/', '/privacy-policy', '/terms'],
+        disallow: ['/admin/', '/portal/', '/api/', '/privacy-policy', '/terms'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

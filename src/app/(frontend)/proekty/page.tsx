@@ -3,12 +3,14 @@ import ScrollReveal from '@/components/ScrollReveal'
 import { brand, servicePillars } from '@/lib/site-data'
 import YandexMap from '../karta-obektov/YandexMap'
 import { staticMarkers } from './markers-data'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'География и объекты — EM-PCP',
+export const metadata: Metadata = pageMetadata({
+  title: 'География и объекты',
   description:
     'Интерактивная карта выполненных объектов EM-PCP. Фильтры по направлению работ и году. 398 объектов с координатами.',
-}
+  path: '/proekty',
+})
 
 export default function ProjectsPage() {
   return (

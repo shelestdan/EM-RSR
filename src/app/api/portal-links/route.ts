@@ -1,5 +1,6 @@
-export const dynamic = 'force-static'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   // Verify portal session cookie
@@ -8,7 +9,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const baseUrl =
+    process.env.PAYLOAD_INTERNAL_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
   const res = await fetch(`${baseUrl}/api/portal-links?sort=order&limit=100`, {
     headers: { Authorization: `JWT ${token}` },

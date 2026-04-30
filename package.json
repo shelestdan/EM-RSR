@@ -6,9 +6,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:prod": "npm run check:env && next build",
     "start": "next start",
     "check:env": "node scripts/check-production-env.mjs",
+    "deploy:vps": "bash scripts/deploy-vps.sh",
     "deploy:gh-pages": "bash scripts/deploy-gh-pages.sh",
+    "backup:vps": "bash scripts/backup-vps.sh",
+    "generate:assets": "node scripts/generate-site-assets.mjs",
     "generate:types": "payload generate:types",
     "lint": "next lint"
   },

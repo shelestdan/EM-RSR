@@ -4,12 +4,14 @@ import OfficeMapTabs from '@/components/OfficeMapTabs'
 import ScrollReveal from '@/components/ScrollReveal'
 import CopyNumber from '@/components/CopyNumber'
 import { brand } from '@/lib/site-data'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'Контакты — EM-PCP',
+export const metadata: Metadata = pageMetadata({
+  title: 'Контакты',
   description:
     'Контакты EM-PCP: телефон, MAX, email, офисы Санкт-Петербург и Краснодар, форма заявки.',
-}
+  path: '/kontakty',
+})
 
 const PhoneIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">

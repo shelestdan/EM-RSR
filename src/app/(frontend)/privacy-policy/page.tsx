@@ -1,10 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = {
-  title: 'Политика конфиденциальности — ЕМ-ПСП',
-  description: 'Политика обработки персональных данных ООО «ЕМ-ПолиСпецПроект» в соответствии с ФЗ-152.',
-  robots: { index: false },
+  ...pageMetadata({
+    title: 'Политика конфиденциальности',
+    description: 'Политика обработки персональных данных ООО «ЕМ-ПолиСпецПроект» в соответствии с ФЗ-152.',
+    path: '/privacy-policy',
+    noIndex: true,
+  }),
+  title: 'Политика конфиденциальности',
 }
 
 export default function PrivacyPolicyPage() {

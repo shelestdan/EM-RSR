@@ -1,9 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { pageMetadata } from '@/lib/seo'
 
 export const metadata: Metadata = {
-  title: 'Пользовательское соглашение — ЕМ-ПСП',
-  robots: { index: false },
+  ...pageMetadata({
+    title: 'Пользовательское соглашение',
+    description: 'Пользовательское соглашение сайта ЕМ-ПСП.',
+    path: '/terms',
+    noIndex: true,
+  }),
+  title: 'Пользовательское соглашение',
 }
 
 export default function TermsPage() {

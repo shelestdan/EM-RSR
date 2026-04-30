@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next'
+import { siteUrl } from '@/lib/seo'
 
 export const dynamic = 'force-static'
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://em-psp.ru'
+const baseUrl = siteUrl
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [

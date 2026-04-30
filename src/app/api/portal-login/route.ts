@@ -1,5 +1,6 @@
-export const dynamic = 'force-static'
 import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
 
 const PORTAL_COOKIE = 'portal_session'
 
@@ -9,7 +10,8 @@ export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
   const userAgent = req.headers.get('user-agent') || ''
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const baseUrl =
+    process.env.PAYLOAD_INTERNAL_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
   // Authenticate against Payload's portal-users collection
   const res = await fetch(`${baseUrl}/api/portal-users/login`, {
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 60 * 45, // 45 min
-    path: '/portal',
+    path: '/',
   })
 
   return response
@@ -49,6 +51,12 @@ export async function POST(req: NextRequest) {
 // Logout
 export async function DELETE() {
   const response = NextResponse.json({ ok: true })
-  response.cookies.delete(PORTAL_COOKIE)
+  response.cookies.set(PORTAL_COOKIE, '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 0,
+    path: '/',
+  })
   return response
 }

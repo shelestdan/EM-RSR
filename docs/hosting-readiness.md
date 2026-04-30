@@ -104,3 +104,19 @@ Not enough:
 - static hosting only
 
 Static-only fallback still works through GitHub Pages, but Admin and Portal will not work there.
+
+## Purchased Target
+
+Current target is REG.RU ФЗ-152 VPS on Ubuntu 24.04.
+
+Use the exact launch runbook:
+
+- `docs/regru-vps-launch.md`
+
+Production helper files already exist:
+
+- `ecosystem.config.cjs` — PM2 process
+- `deploy/nginx/em-psp.conf.example` — Nginx reverse proxy
+- `scripts/server-setup-regru.sh` — first server setup
+- `scripts/deploy-vps.sh` — repeatable deploy
+- `scripts/backup-vps.sh` — DB and media backup

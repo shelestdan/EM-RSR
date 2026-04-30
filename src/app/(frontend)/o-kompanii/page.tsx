@@ -2,14 +2,16 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import ScrollReveal from '@/components/ScrollReveal'
 import CopyNumber from '@/components/CopyNumber'
+import { pageMetadata } from '@/lib/seo'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
-export const metadata: Metadata = {
-  title: 'О компании — EM-PCP',
+export const metadata: Metadata = pageMetadata({
+  title: 'О компании',
   description:
-    'ООО «ЕМ-ПолиСпецПроект»: инжиниринговая компания полного цикла. СРО проектирование и изыскания, ISO 9001/14001/45001. 150+ объектов, 40+ регионов.',
-}
+    'ООО «ЕМ-ПолиСпецПроект»: инжиниринговая компания полного цикла. СРО проектирование и изыскания, ISO 9001/14001/45001. 398 объектов.',
+  path: '/o-kompanii',
+})
 
 const Arrow = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">

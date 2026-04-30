@@ -3,12 +3,14 @@ import EngineeringDisciplineSection from '@/components/EngineeringDisciplineSect
 import LeadForm from '@/components/LeadForm'
 import ScrollReveal from '@/components/ScrollReveal'
 import { brand, servicePillars } from '@/lib/site-data'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'Услуги — ЕМ-ПСП',
+export const metadata: Metadata = pageMetadata({
+  title: 'Услуги',
   description:
     'Изыскания, проектирование, инженерные сети, экспертиза и авторский надзор для объектов капитального строительства.',
-}
+  path: '/uslugi',
+})
 
 const Arrow = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">

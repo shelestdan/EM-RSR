@@ -9,6 +9,7 @@ import YandexMap from './karta-obektov/YandexMap'
 import { staticMarkers } from './proekty/markers-data'
 import { brand, metrics, principles, servicePillars } from '@/lib/site-data'
 import HeroAcronym from '@/components/HeroAcronym'
+import { pageMetadata } from '@/lib/seo'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -47,14 +48,12 @@ const homeServiceCards = [
 ]
 
 export const metadata: Metadata = {
-  title: 'EM-PCP — инженерное проектирование, строительство, экспертиза',
-  description:
-    'EM-PCP ведёт инженерные объекты от изысканий и проектирования до строительства, экспертизы и авторского надзора. СРО, ISO, 150+ объектов.',
-  openGraph: {
-    title: 'EM-PCP — инженерные объекты под полную ответственность',
-    description: 'Проектирование, сети, строительство, экспертиза и авторский надзор.',
-    images: [{ url: `${BASE}/brand/logo.png`, width: 1200, height: 630 }],
-  },
+  ...pageMetadata({
+    title: 'Инженерное проектирование, строительство, экспертиза',
+    description:
+      'EM-PCP ведёт инженерные объекты от изысканий и проектирования до строительства, экспертизы и авторского надзора. СРО, ISO, 398 объектов.',
+    path: '/',
+  }),
 }
 
 const Arrow = () => (
