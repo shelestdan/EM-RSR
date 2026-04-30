@@ -83,7 +83,10 @@ function AcronymTable({ locale }: { locale: SiteLocale }) {
           <span className="shrink-0 font-brand text-[28px] font-black leading-[1] text-[#1a3a72] sm:text-[34px] lg:text-[44px]">
             {row.letter}
           </span>
-          <span className="font-brand text-[20px] font-black leading-[1.1] text-[#3E5854] sm:text-[22px] lg:text-[28px]">
+          <span
+            className="font-brand text-[20px] font-black leading-[1.1] text-[#3E5854] sm:text-[22px] lg:text-[28px]"
+            style={{ marginLeft: 'clamp(-36px, -7vw, -28px)' }}
+          >
             {row.title}
           </span>
           <p className="col-span-2 mt-1 pl-10 text-[15px] leading-[1.5] text-[#2a2d40]/80 sm:col-span-1 sm:mt-0 sm:pl-0 sm:text-[15px] sm:leading-[1.55] lg:text-[17px] lg:leading-[1.55]">

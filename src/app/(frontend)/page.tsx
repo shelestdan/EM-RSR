@@ -92,7 +92,7 @@ export default function HomePage() {
 
           {/* LEFT — CONTENT */}
           <div className="relative flex flex-col bg-white">
-            <div className="relative flex flex-1 flex-col justify-center px-5 pb-10 pt-12 sm:px-8 sm:pb-12 sm:pt-14 lg:px-10 lg:pb-16 lg:pt-16 xl:px-14">
+            <div className="relative flex flex-1 flex-col justify-center px-5 pb-10 pt-12 sm:px-8 sm:pb-12 sm:pt-14 lg:px-10 lg:pb-16 lg:pt-32 xl:px-14">
               <HeroAcronym />
             </div>
           </div>
