@@ -197,6 +197,19 @@ const DIRECTION_FILTERS = [
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
+function escapeHtml(value: string | number | undefined | null): string {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
+}
+
+function escapeAttr(value: string | undefined | null): string {
+  return escapeHtml(value)
+}
+
 // ─────────────────────────────────────────────────────────────
 // ICON HTML BUILDER
 // ─────────────────────────────────────────────────────────────
@@ -267,14 +280,24 @@ function buildIconHtml(cat: string): string {
 // POPUP CSS
 // ─────────────────────────────────────────────────────────────
 const POPUP_STYLES = `
-.leaflet-popup-content-wrapper {
-  border-radius: 0 !important;
-  border: 1px solid #d9d6cb !important;
-  box-shadow: 0 24px 50px rgba(13,16,28,.18) !important;
-  padding: 0 !important;
+.leaflet-popup {
+  max-width: calc(100vw - 32px) !important;
 }
-.leaflet-popup-content { margin: 0 !important; line-height: 1 !important; }
+.leaflet-popup-content-wrapper {
+  max-width: calc(100vw - 32px) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(35,39,63,.12) !important;
+  box-shadow: 0 22px 56px rgba(13,16,28,.18) !important;
+  padding: 0 !important;
+  background: #fff !important;
+}
+.leaflet-popup-content {
+  width: min(340px, calc(100vw - 32px)) !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
 .leaflet-popup-tip-container { display: none !important; }
+.leaflet-popup-close-button { display: none !important; }
 .em-leaflet-office-icon {
   width: 38px !important;
   height: 38px !important;
@@ -312,28 +335,129 @@ const POPUP_STYLES = `
   background-repeat: no-repeat;
   background-size: contain;
 }
-.em-popup { padding: 16px 18px; font-family: inherit; min-width: 240px; max-width: 300px; }
-.em-popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
-.em-popup-contract { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
-.em-popup-year { font-size: 11px; font-weight: 700; color: #626675; white-space: nowrap; }
-.em-popup-title { font-size: 13px; font-weight: 800; line-height: 1.38; color: #23273F; margin-bottom: 7px; }
-.em-popup-desc { font-size: 11px; line-height: 1.55; color: #626675; margin-bottom: 7px; }
-.em-popup-conclusion { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 7px; }
-.em-popup-conclusion-text { font-size: 11px; line-height: 1.5; color: #626675; flex: 1; }
+.em-popup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  padding-right: 44px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #23273F;
+  background: #fff;
+}
+.em-popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(35,39,63,.10);
+  background: #fff;
+  color: #626675;
+  font: 22px/1 Arial, Helvetica, sans-serif;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.em-popup-close:hover {
+  color: #23273F;
+  border-color: rgba(35,39,63,.22);
+}
+.em-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.em-popup-contract {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+.em-popup-year {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #626675;
+  white-space: nowrap;
+}
+.em-popup-title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #23273F;
+}
+.em-popup-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  color: #626675;
+}
+.em-popup-conclusion {
+  padding-top: 10px;
+  border-top: 1px solid rgba(217,214,203,.82);
+}
+.em-popup-conclusion-label {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #3E5854;
+  text-transform: uppercase;
+}
+.em-popup-conclusion-text {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #626675;
+}
 .em-popup-conclusion-link {
-  font-size: 11px; font-weight: 800; color: #3E5854; text-decoration: none;
-  flex-shrink: 0; padding: 2px 0; border-bottom: 1px solid #3E5854;
-  transition: color .15s;
+  display: inline-flex;
+  margin-top: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: .08em;
+  color: #3E5854;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid #3E5854;
+  transition: color .15s, border-color .15s;
 }
 .em-popup-conclusion-link:hover { color: #23273F; border-color: #23273F; }
 .em-popup-ymaps {
-  display: inline-block; margin-top: 10px;
-  font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
-  color: #3E5854; text-decoration: none;
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: #3E5854;
+  text-decoration: none;
   border-bottom: 1px solid #3E5854; padding-bottom: 1px;
-  transition: color .15s;
+  transition: color .15s, border-color .15s;
 }
 .em-popup-ymaps:hover { color: #23273F; border-color: #23273F; }
+@media (max-width: 640px) {
+  .em-popup {
+    padding: 15px 16px;
+    padding-right: 42px;
+  }
+  .em-popup-contract,
+  .em-popup-year,
+  .em-popup-conclusion-label,
+  .em-popup-conclusion-link,
+  .em-popup-ymaps {
+    font-size: 10px;
+  }
+  .em-popup-title {
+    font-size: 13px;
+  }
+}
 `
 
 // ─────────────────────────────────────────────────────────────
@@ -349,43 +473,49 @@ function buildPopupHtml(marker: MapMarkerData): string {
     `https://yandex.ru/maps/?ll=${marker.lng},${marker.lat}&z=16&pt=${marker.lng},${marker.lat},pm2rdm`
 
   const descText = marker.workDescription || marker.description || ''
+  const year = escapeHtml(marker.year)
 
   if (isOffice) {
     return `
       <div class="em-popup">
-        <div class="em-popup-title">${marker.title}</div>
-        ${descText ? `<div class="em-popup-desc">${descText}</div>` : ''}
-        <a href="${ymapsUrl}" target="_blank" rel="noopener noreferrer"
+        <button type="button" class="em-popup-close" data-em-popup-close aria-label="Закрыть карточку">×</button>
+        <div class="em-popup-header">
+          <span class="em-popup-contract" style="color:${color}">ОФИС</span>
+          <span class="em-popup-year">${year}</span>
+        </div>
+        <div class="em-popup-title">${escapeHtml(marker.title)}</div>
+        ${descText ? `<div class="em-popup-desc">${escapeHtml(descText)}</div>` : ''}
+        <a href="${escapeAttr(ymapsUrl)}" target="_blank" rel="noopener noreferrer"
            class="em-popup-ymaps" aria-label="Открыть офис в Яндекс.Картах">
           ОТКРЫТЬ В ЯНДЕКС.КАРТАХ →
         </a>
       </div>`
   }
 
-  const headerLeft = marker.contractType
-    ? `<span class="em-popup-contract" style="color:${color}">${marker.contractType}</span>`
-    : `<span class="em-popup-contract" style="color:${color}">${t.label}</span>`
+  const headerLeft = `<span class="em-popup-contract" style="color:${color}">${escapeHtml(marker.contractType || 'ПО ДОГОВОРУ')}</span>`
 
   const conclusionBlock = marker.positiveConclusion
     ? `<div class="em-popup-conclusion">
-        <span class="em-popup-conclusion-text">${marker.positiveConclusion}</span>
+        <div class="em-popup-conclusion-label">Положительное заключение</div>
+        <div class="em-popup-conclusion-text">${escapeHtml(marker.positiveConclusion)}</div>
         ${marker.conclusionUrl
-          ? `<a href="${marker.conclusionUrl}" target="_blank" rel="noopener noreferrer"
-               class="em-popup-conclusion-link" aria-label="Открыть заключение">↗</a>`
+          ? `<a href="${escapeAttr(marker.conclusionUrl)}" target="_blank" rel="noopener noreferrer"
+               class="em-popup-conclusion-link" aria-label="Открыть заключение">Открыть заключение →</a>`
           : ''}
       </div>`
     : ''
 
   return `
     <div class="em-popup">
+      <button type="button" class="em-popup-close" data-em-popup-close aria-label="Закрыть карточку">×</button>
       <div class="em-popup-header">
         ${headerLeft}
-        <span class="em-popup-year">${marker.year}</span>
+        <span class="em-popup-year">${year}</span>
       </div>
-      <div class="em-popup-title">${marker.title}</div>
-      ${descText ? `<div class="em-popup-desc">${descText}</div>` : ''}
+      <div class="em-popup-title">${escapeHtml(marker.title)}</div>
+      ${descText ? `<div class="em-popup-desc">${escapeHtml(descText)}</div>` : ''}
       ${conclusionBlock}
-      <a href="${ymapsUrl}" target="_blank" rel="noopener noreferrer"
+      <a href="${escapeAttr(ymapsUrl)}" target="_blank" rel="noopener noreferrer"
          class="em-popup-ymaps" aria-label="Открыть объект в Яндекс.Картах">
         ОТКРЫТЬ В ЯНДЕКС.КАРТАХ →
       </a>
@@ -476,6 +606,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
   const [directionFilters, setDirectionFilters] = useState<string[]>([])
   const [yearFilters, setYearFilters] = useState<number[]>([])
   const [mapReady, setMapReady] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   const allMarkers = useMemo(() => [...initialMarkers, ...OFFICE_MARKERS], [initialMarkers])
 
@@ -518,10 +649,35 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
   const hasFilters = directionFilters.length > 0 || yearFilters.length > 0
 
+  useEffect(() => {
+    if (!isFullscreen) return
+
+    document.body.style.overflow = 'hidden'
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsFullscreen(false)
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKeyDown)
+    }
+  }, [isFullscreen])
+
+  useEffect(() => {
+    if (!mapReady || !mapInstanceRef.current) return
+    const timers = [
+      window.setTimeout(() => mapInstanceRef.current?.invalidateSize?.(), 60),
+      window.setTimeout(() => mapInstanceRef.current?.invalidateSize?.(), 360),
+    ]
+    return () => timers.forEach((timer) => window.clearTimeout(timer))
+  }, [isFullscreen, mapReady])
+
   // ─── Init map (once) ───────────────────────────────────────
   useEffect(() => {
     if (typeof window === 'undefined' || !mapRef.current) return
     let cancelled = false
+    let cleanupMap: (() => void) | null = null
 
     if (!document.getElementById('em-leaflet-styles')) {
       const style = document.createElement('style')
@@ -555,11 +711,26 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
       L.control.attribution({ position: 'bottomright', prefix: false }).addTo(map)
 
+      const onPopupCloseClick = (event: MouseEvent) => {
+        const target = event.target as HTMLElement | null
+        if (!target?.closest?.('[data-em-popup-close]')) return
+        map.closePopup()
+      }
+      map.getContainer().addEventListener('click', onPopupCloseClick)
+      cleanupMap = () => {
+        map.getContainer().removeEventListener('click', onPopupCloseClick)
+        map.remove()
+        mapInstanceRef.current = null
+      }
+
       mapInstanceRef.current = map
       setMapReady(true)
     })
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      cleanupMap?.()
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -594,9 +765,10 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
               lineJoin: 'round',
             },
           ).bindPopup(buildPopupHtml(markerData), {
-            maxWidth: 320,
-            minWidth: 240,
-            closeButton: true,
+            maxWidth: 340,
+            closeButton: false,
+            autoPan: true,
+            keepInView: true,
           })
 
           polyline.addTo(map)
@@ -613,9 +785,10 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
         const marker = L.marker([markerData.lat, markerData.lng], { icon })
           .bindPopup(buildPopupHtml(markerData), {
-            maxWidth: 320,
-            minWidth: 240,
-            closeButton: true,
+            maxWidth: 340,
+            closeButton: false,
+            autoPan: true,
+            keepInView: true,
           })
 
         marker.addTo(map)
@@ -625,14 +798,30 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
   }, [mapReady, filterFn, allMarkers])
 
   return (
-    <section className="relative z-0 bg-[#f6f5f1] pb-20">
+    <section
+      className={
+        isFullscreen
+          ? 'fixed inset-0 z-[120] overflow-y-auto bg-[#f6f5f1] pb-[calc(24px+env(safe-area-inset-bottom))]'
+          : 'relative z-0 bg-[#f6f5f1] pb-20'
+      }
+    >
+      {isFullscreen && (
+        <button
+          type="button"
+          onClick={() => setIsFullscreen(false)}
+          className="fixed right-4 top-4 z-[140] grid h-11 w-11 place-items-center border border-[#d9d6cb] bg-white text-[30px] leading-none text-[#23273F] shadow-[0_12px_32px_rgba(13,16,28,0.18)] transition-colors hover:border-[#3E5854] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854]"
+          aria-label="Закрыть полноэкранную карту"
+        >
+          ×
+        </button>
+      )}
+
       {/* ─── FILTER BAR ──────────────────────────────────────── */}
       {showFilters && (
-        <div className="border-b border-[#d9d6cb] bg-white">
+        <div className={isFullscreen ? 'max-h-[34svh] overflow-y-auto bg-white' : 'bg-white'}>
           <div className="container mx-auto px-5 sm:px-6 lg:px-8 py-7 sm:py-9">
 
             <div className="mb-5 flex items-center gap-2">
-              <span className="h-px w-5 bg-[#d14232]" aria-hidden="true" />
               <span className="text-[11px] font-black uppercase tracking-[0.18em] text-[#626675]/60">
                 Объектов
               </span>
@@ -723,9 +912,17 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
       )}
 
       {/* ─── MAP CANVAS ──────────────────────────────────────── */}
-      <div className="container-wide mx-auto px-5 pt-10 sm:px-6 lg:px-8">
+      <div className={`container-wide mx-auto px-5 sm:px-6 lg:px-8 ${isFullscreen ? 'pt-4 sm:pt-5' : 'pt-10'}`}>
         <div className="relative overflow-hidden border border-[#d9d6cb] bg-white shadow-[0_40px_120px_rgba(13,16,28,0.14)]">
-          <div ref={mapRef} className="h-[62vh] min-h-[420px] w-full sm:h-[72vh] sm:min-h-[560px]" />
+          <div ref={mapRef} className={isFullscreen ? 'h-[72svh] min-h-[420px] w-full sm:h-[76svh]' : 'h-[62vh] min-h-[420px] w-full sm:h-[72vh] sm:min-h-[560px]'} />
+          <button
+            type="button"
+            onClick={() => setIsFullscreen((value) => !value)}
+            className={`absolute right-4 z-[500] border border-[#d9d6cb] bg-white px-4 py-3 text-[10px] font-black uppercase tracking-[0.12em] text-[#23273F] shadow-[0_12px_32px_rgba(13,16,28,0.16)] transition-colors hover:border-[#3E5854] hover:text-[#3E5854] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] sm:text-[11px] ${isFullscreen ? 'top-[68px]' : 'top-4'}`}
+            aria-pressed={isFullscreen}
+          >
+            {isFullscreen ? 'Свернуть карту' : 'Развернуть на весь экран'}
+          </button>
         </div>
 
         {/* ─── LEGEND ──────────────────────────────────────── */}
