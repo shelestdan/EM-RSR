@@ -8,7 +8,7 @@ export NODE_ENV=production
 export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=1536}"
 
 echo "==> Installing dependencies"
-npm ci
+npm ci --include=dev
 
 echo "==> Checking production environment"
 npm run check:env
