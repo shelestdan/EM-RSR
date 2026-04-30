@@ -7,6 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "check:env": "node scripts/check-production-env.mjs",
+    "deploy:gh-pages": "bash scripts/deploy-gh-pages.sh",
     "generate:types": "payload generate:types",
     "lint": "next lint"
   },
