@@ -37,3 +37,12 @@ export function getBrowserSiteLocale(): SiteLocale {
     normalizeSiteLocale(document.documentElement.lang)
   )
 }
+
+export function getExplicitBrowserSiteLocale(): SiteLocale | null {
+  if (typeof window === 'undefined') return null
+
+  return (
+    getSiteLocaleFromSearch(window.location.search) ||
+    getSiteLocaleFromPath(window.location.pathname)
+  )
+}

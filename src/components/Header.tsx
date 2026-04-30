@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useSiteLocale } from '@/hooks/useSiteLocale'
+import { useAnimatedSiteLocale } from '@/hooks/useSiteLocale'
 import { brand } from '@/lib/site-data'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
@@ -45,8 +45,7 @@ export default function Header() {
   })
   const [hoveredHref, setHoveredHref] = useState<string | null>(null)
   const currentPath = normalizeNavPath(pathname)
-  const locale = useSiteLocale(currentPath)
-  const descriptorLines = brand.descriptorLines[locale]
+  const locale = useAnimatedSiteLocale({ pathname: currentPath, autoCycleMs: 4000 })
 
   // Scroll handler — scrolled state + progress bar
   useEffect(() => {
@@ -190,14 +189,28 @@ export default function Header() {
                 {brand.short}
               </span>
               <span
-                className={`hidden max-w-[260px] grid-cols-1 font-bold uppercase leading-[1.25] text-[#8ab0a3]/72 transition-all duration-500 ease-out xl:grid ${
+                className={`relative hidden max-w-[260px] overflow-hidden font-bold uppercase leading-[1.25] text-[#8ab0a3]/72 transition-all duration-500 ease-out xl:block ${
                   scrolled
-                    ? 'mt-0.5 gap-0 text-[8px] tracking-[0.14em]'
-                    : 'mt-1.5 gap-0.5 text-[9px] tracking-[0.15em]'
+                    ? 'mt-0.5 h-[21px] text-[8px] tracking-[0.14em]'
+                    : 'mt-1.5 h-[24px] text-[9px] tracking-[0.15em]'
                 }`}
               >
-                {descriptorLines.map((line) => (
-                  <span key={line}>{line}</span>
+                {(['ru', 'en'] as const).map((entry) => (
+                  <span
+                    key={entry}
+                    aria-hidden={locale !== entry}
+                    className={`absolute inset-0 grid grid-cols-1 transition-all duration-500 ease-out ${
+                      locale === entry
+                        ? 'translate-y-0 opacity-100'
+                        : entry === 'ru'
+                          ? '-translate-y-1 opacity-0'
+                          : 'translate-y-1 opacity-0'
+                    }`}
+                  >
+                    {brand.descriptorLines[entry].map((line) => (
+                      <span key={line}>{line}</span>
+                    ))}
+                  </span>
                 ))}
               </span>
             </span>

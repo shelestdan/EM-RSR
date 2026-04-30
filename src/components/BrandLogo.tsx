@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useSiteLocale } from '@/hooks/useSiteLocale'
+import { useAnimatedSiteLocale } from '@/hooks/useSiteLocale'
 import { brand } from '@/lib/site-data'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
@@ -11,8 +11,7 @@ interface BrandLogoProps {
 }
 
 export default function BrandLogo({ className = '' }: BrandLogoProps) {
-  const locale = useSiteLocale()
-  const descriptorLines = brand.descriptorLines[locale]
+  const locale = useAnimatedSiteLocale({ autoCycleMs: 4000 })
 
   return (
     <Link
@@ -40,9 +39,23 @@ export default function BrandLogo({ className = '' }: BrandLogoProps) {
         <span className="font-brand text-[20px] font-black leading-none tracking-[-0.01em] text-white">
           {brand.short}
         </span>
-        <span className="mt-1.5 grid max-w-[260px] grid-cols-1 text-[9px] font-bold uppercase leading-[1.25] tracking-[0.15em] text-[#8ab0a3]/72">
-          {descriptorLines.map((line) => (
-            <span key={line}>{line}</span>
+        <span className="relative mt-1.5 h-[24px] max-w-[260px] overflow-hidden text-[9px] font-bold uppercase leading-[1.25] tracking-[0.15em] text-[#8ab0a3]/72">
+          {(['ru', 'en'] as const).map((entry) => (
+            <span
+              key={entry}
+              aria-hidden={locale !== entry}
+              className={`absolute inset-0 grid grid-cols-1 transition-all duration-500 ease-out ${
+                locale === entry
+                  ? 'translate-y-0 opacity-100'
+                  : entry === 'ru'
+                    ? '-translate-y-1 opacity-0'
+                    : 'translate-y-1 opacity-0'
+              }`}
+            >
+              {brand.descriptorLines[entry].map((line) => (
+                <span key={line}>{line}</span>
+              ))}
+            </span>
           ))}
         </span>
       </span>
