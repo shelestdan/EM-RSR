@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DOMAIN="${DOMAIN:-em-psp.ru}"
+DOMAIN="${DOMAIN:-em-pcp.ru}"
+IDN_DOMAIN="${IDN_DOMAIN:-xn----itbvnal.xn--p1ai}"
 APP_DIR="${APP_DIR:-/var/www/em-rsr}"
 REPO_URL="${REPO_URL:-https://github.com/shelestdan/EM-RSR.git}"
 DB_NAME="${DB_NAME:-em_rsr}"
@@ -73,6 +74,6 @@ Next:
 2. cp .env.production.example .env.production
 3. fill .env.production
 4. npm run deploy:vps
-5. certbot --nginx -d ${DOMAIN} -d www.${DOMAIN}
+5. certbot --nginx -d ${DOMAIN} -d www.${DOMAIN} -d ${IDN_DOMAIN} -d www.${IDN_DOMAIN}
 
 EOF

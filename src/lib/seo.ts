@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
-export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://em-psp.ru').replace(/\/$/, '')
+export const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || 'https://em-pcp.ru').replace(/\/$/, '')
 export const siteName = 'ЕМ-ПСП'
 export const defaultDescription =
   'ООО «ЕМ-ПолиСпецПроект» — проектирование, строительство и сопровождение инженерных систем. СРО, ISO 9001, 14001, 45001.'

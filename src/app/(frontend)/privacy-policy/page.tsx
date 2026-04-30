@@ -118,7 +118,7 @@ export default function PrivacyPolicyPage() {
                 Оператор оставляет за собой право вносить изменения в настоящую Политику. Актуальная версия
                 всегда доступна по адресу{' '}
                 <Link href="/privacy-policy" className="text-[#3E5854] underline underline-offset-4 hover:text-[#23273F]">
-                  em-psp.ru/privacy-policy
+                  em-pcp.ru/privacy-policy
                 </Link>.
               </p>
             </article>

@@ -19,8 +19,10 @@ Required swap: 4 GB. The setup script creates it if no swap exists.
 
 Before SSL:
 
-- `A em-psp.ru -> SERVER_IP`
-- `A www.em-psp.ru -> SERVER_IP`
+- `A em-pcp.ru -> SERVER_IP`
+- `A www.em-pcp.ru -> SERVER_IP`
+- `A ем-псп.рф -> SERVER_IP`
+- `A www.ем-псп.рф -> SERVER_IP`
 
 ## One-Time Server Setup
 
@@ -57,7 +59,7 @@ nano .env.production
 Required values:
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://em-psp.ru
+NEXT_PUBLIC_SITE_URL=https://em-pcp.ru
 DATABASE_URI=postgresql://em_rsr:PASTE_PASSWORD@127.0.0.1:5432/em_rsr
 PAYLOAD_SECRET=PASTE_RANDOM_32_PLUS_CHARS
 PAYLOAD_API_KEY=PASTE_RANDOM_32_PLUS_CHARS
@@ -92,7 +94,7 @@ pm2 logs em-rsr --lines 80
 After DNS points to server:
 
 ```bash
-sudo certbot --nginx -d em-psp.ru -d www.em-psp.ru
+sudo certbot --nginx -d em-pcp.ru -d www.em-pcp.ru -d xn----itbvnal.xn--p1ai -d www.xn----itbvnal.xn--p1ai
 sudo nginx -t
 sudo systemctl reload nginx
 ```
@@ -101,7 +103,7 @@ sudo systemctl reload nginx
 
 Open:
 
-- `https://em-psp.ru/admin`
+- `https://em-pcp.ru/admin`
 
 First Payload visit creates first admin user.
 
@@ -115,7 +117,7 @@ Then create:
 
 Open:
 
-- `https://em-psp.ru/portal`
+- `https://em-pcp.ru/portal`
 
 Login with created contractor user. Dashboard must show links from Admin.
 

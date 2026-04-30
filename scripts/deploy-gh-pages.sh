@@ -25,7 +25,7 @@ trap restore EXIT
 
 # ── 2. Build static export ────────────────────────────────────
 echo "  -> Building with GITHUB_PAGES=true"
-NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://em-psp.ru}" GITHUB_PAGES=true npm run build
+NEXT_PUBLIC_SITE_URL="${NEXT_PUBLIC_SITE_URL:-https://em-pcp.ru}" GITHUB_PAGES=true npm run build
 
 # ── 3. Push out/ to gh-pages ─────────────────────────────────
 OUT_DIR="$PROJECT_DIR/out"

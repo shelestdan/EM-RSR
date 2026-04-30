@@ -1,7 +1,7 @@
 server {
     listen 80;
     listen [::]:80;
-    server_name em-psp.ru www.em-psp.ru;
+    server_name em-pcp.ru www.em-pcp.ru xn----itbvnal.xn--p1ai www.xn----itbvnal.xn--p1ai;
 
     client_max_body_size 50m;
 
