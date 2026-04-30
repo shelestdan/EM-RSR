@@ -80,14 +80,13 @@ function AcronymTable({ locale }: { locale: SiteLocale }) {
           className="grid grid-cols-[2.5rem_1fr] items-start gap-x-4 py-4 sm:grid-cols-[3rem_minmax(180px,240px)_1fr] sm:gap-x-6 sm:py-5 lg:grid-cols-[3.5rem_minmax(220px,280px)_1fr] lg:gap-x-8 lg:py-6"
           style={{ transitionDelay: `${index * 45}ms` }}
         >
-          <span className="shrink-0 font-brand text-[28px] font-black leading-[1] text-[#1a3a72] sm:text-[34px] lg:text-[44px]">
-            {row.letter}
-          </span>
-          <span
-            className="font-brand text-[20px] font-black leading-[1.1] text-[#3E5854] sm:text-[22px] lg:text-[28px]"
-            style={{ marginLeft: 'clamp(-36px, -7vw, -28px)' }}
-          >
-            {row.title}
+          <span className="col-span-2 flex min-w-0 items-baseline whitespace-nowrap font-brand font-black leading-none">
+            <span className="text-[36px] text-[#1a3a72] sm:text-[46px] lg:text-[64px]">
+              {row.letter}
+            </span>
+            <span className="text-[23px] text-[#3E5854] sm:text-[28px] lg:text-[38px]">
+              {row.title}
+            </span>
           </span>
           <p className="col-span-2 mt-1 pl-10 text-[15px] leading-[1.5] text-[#2a2d40]/80 sm:col-span-1 sm:mt-0 sm:pl-0 sm:text-[15px] sm:leading-[1.55] lg:text-[17px] lg:leading-[1.55]">
             {row.text}
