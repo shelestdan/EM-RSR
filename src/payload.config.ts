@@ -20,6 +20,7 @@ import { HomePage } from './globals/HomePage'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const shouldPushDatabaseSchema = process.env.PAYLOAD_DB_PUSH === 'true'
 
 export default buildConfig({
   admin: {
@@ -54,6 +55,7 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    push: shouldPushDatabaseSchema,
   }),
   sharp,
   i18n: {
