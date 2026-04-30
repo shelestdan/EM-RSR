@@ -315,7 +315,7 @@ export interface Project {
   createdAt: string;
 }
 /**
- * Метки на интерактивной карте выполненных объектов
+ * Заготовка будущей админки меток. Сейчас публичная карта берёт данные из staticMarkers, источник — DOCX со ссылками на Yandex constructor.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "map-markers".
@@ -331,16 +331,41 @@ export interface MapMarker {
    * Например: 38.9753
    */
   lng: number;
-  type:
-    | 'capital_with_expertise'
-    | 'capital_no_expertise'
-    | 'water_supply'
-    | 'gas_supply'
-    | 'author_supervision'
-    | 'gasification';
+  /**
+   * Служебное поле для совместимости со старой схемой.
+   */
+  type?: ('proektirovanie' | 'izyskaniya' | 'nadzor' | 'gasification') | null;
+  /**
+   * Значения и обозначения соответствуют файлу «Обозначение на карте объектов».
+   */
+  category:
+    | 'combined'
+    | 'surveys'
+    | 'water'
+    | 'sewer'
+    | 'gas'
+    | 'electricity'
+    | 'heating'
+    | 'boiler'
+    | 'other'
+    | 'authorSupervision'
+    | 'support';
+  contractType?: ('ГЕНПОДРЯД' | 'СУБПОДРЯД' | 'ПО ДОГОВОРУ' | 'В СОСТАВЕ КОМАНДЫ') | null;
   region: 'krasnodar' | 'spb' | 'lenobl' | 'rostov' | 'stavropol' | 'other';
   year: number;
+  /**
+   * Будущее поле popup: выполняемые работы.
+   */
   description?: string | null;
+  /**
+   * Опционально. Если пусто, в popup блок не выводится.
+   */
+  positiveConclusion?: string | null;
+  conclusionUrl?: string | null;
+  /**
+   * Если пусто, публичная карта сможет собрать ссылку из координат.
+   */
+  yandexMapsUrl?: string | null;
   /**
    * Опционально — ссылка на страницу проекта
    */
@@ -688,9 +713,14 @@ export interface MapMarkersSelect<T extends boolean = true> {
   lat?: T;
   lng?: T;
   type?: T;
+  category?: T;
+  contractType?: T;
   region?: T;
   year?: T;
   description?: T;
+  positiveConclusion?: T;
+  conclusionUrl?: T;
+  yandexMapsUrl?: T;
   project?: T;
   updatedAt?: T;
   createdAt?: T;

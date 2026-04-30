@@ -16,6 +16,9 @@ npm run check:env
 echo "==> Building application"
 npm run build
 
+echo "==> Running database migrations"
+npx payload migrate
+
 echo "==> Starting/reloading PM2"
 pm2 startOrReload ecosystem.config.cjs --env production
 pm2 save
