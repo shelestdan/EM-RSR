@@ -209,16 +209,10 @@ function buildIconHtml(cat: string): string {
   const hover = `onmouseenter="this.style.transform='scale(1.25)'" onmouseleave="this.style.transform='scale(1)'"`
 
   if (cat === 'office') {
-    return `<div style="
-        display:inline-flex;align-items:center;justify-content:center;
-        background:#fff;width:38px;height:38px;border-radius:3px;
-        border:2px solid #23273F;
-        box-shadow:0 4px 16px rgba(13,16,28,.45);
-        cursor:pointer;transition:transform .15s ease;transform-origin:bottom center;
-        position:relative;transform:translate(-50%,-100%);"
-      onmouseenter="this.style.transform='translate(-50%,-100%) scale(1.1)'"
-      onmouseleave="this.style.transform='translate(-50%,-100%) scale(1)'">
-      <img src="${BASE}/brand/logo-icon.svg" width="22" height="22" style="display:block;" alt="ЕМ-ПСП" />
+    return `<div class="em-map-office-marker"
+      onmouseenter="this.style.transform='scale(1.08)'"
+      onmouseleave="this.style.transform='scale(1)'">
+      <span class="em-map-office-logo" style="background-image:url('${BASE}/brand/logo-icon.svg')" aria-hidden="true"></span>
     </div>`
   }
 
@@ -281,6 +275,43 @@ const POPUP_STYLES = `
 }
 .leaflet-popup-content { margin: 0 !important; line-height: 1 !important; }
 .leaflet-popup-tip-container { display: none !important; }
+.em-leaflet-office-icon {
+  width: 38px !important;
+  height: 38px !important;
+  margin-left: -19px !important;
+  margin-top: -38px !important;
+  background: transparent !important;
+  border: 0 !important;
+  overflow: visible !important;
+}
+.em-leaflet-marker-icon {
+  background: transparent !important;
+  border: 0 !important;
+}
+.em-map-office-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+  border: 2px solid #23273F;
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(13,16,28,.45);
+  cursor: pointer;
+  transform-origin: 50% 100%;
+  transition: transform .15s ease;
+}
+.em-map-office-logo {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
 .em-popup { padding: 16px 18px; font-family: inherit; min-width: 240px; max-width: 300px; }
 .em-popup-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 8px; }
 .em-popup-contract { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
@@ -574,9 +605,9 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
         const icon = L.divIcon({
           html: buildIconHtml(cat),
-          className: '',
-          iconSize:   isOffice ? [0, 0]       : [S, S],
-          iconAnchor: isOffice ? [0, 0]       : [S / 2, S / 2],
+          className: isOffice ? 'em-leaflet-office-icon' : 'em-leaflet-marker-icon',
+          iconSize:   isOffice ? [38, 38]     : [S, S],
+          iconAnchor: isOffice ? [19, 38]     : [S / 2, S / 2],
           popupAnchor:isOffice ? [0, -42]     : [0, -(S / 2 + 8)],
         })
 
@@ -694,7 +725,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
       {/* ─── MAP CANVAS ──────────────────────────────────────── */}
       <div className="container-wide mx-auto px-5 pt-10 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden border border-[#d9d6cb] bg-white shadow-[0_40px_120px_rgba(13,16,28,0.14)]">
-          <div ref={mapRef} className="h-[72vh] min-h-[560px] w-full" />
+          <div ref={mapRef} className="h-[62vh] min-h-[420px] w-full sm:h-[72vh] sm:min-h-[560px]" />
         </div>
 
         {/* ─── LEGEND ──────────────────────────────────────── */}
