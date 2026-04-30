@@ -269,7 +269,7 @@ export default function Header() {
           </nav>
 
           {/* ── RIGHT SIDE ───────────────────────────────────── */}
-          <div className="flex shrink-0 items-center gap-3 lg:ml-auto lg:pl-0">
+          <div className="flex flex-1 shrink-0 items-center justify-end gap-3 lg:flex-none lg:pl-0">
             <a
               href="tel:+79892888980"
               className="group hidden text-right leading-tight xl:block"

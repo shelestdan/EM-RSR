@@ -85,7 +85,7 @@ export default function HomePage() {
   return (
     <>
       {/* ─── HERO ─────────────────────────────────────────────── */}
-      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-white pt-[112px] sm:pt-[118px] lg:pt-[124px] xl:pt-[136px]">
+      <section className="relative isolate flex min-h-svh flex-col overflow-hidden bg-white">
 
         {/* ─── SPLIT BODY 60/40 ───────────────────────────── */}
         <div className="relative z-10 grid flex-1 grid-cols-1 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
