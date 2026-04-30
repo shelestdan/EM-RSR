@@ -112,7 +112,7 @@ export default function HomePage() {
                 xOffset={0.5}
                 playbackRate={1}
                 fit="cover"
-                zoom={0.8}
+                zoom={0.72}
               />
             </div>
           </div>
