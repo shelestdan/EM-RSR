@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSiteLocale } from '@/hooks/useSiteLocale'
+import { brand } from '@/lib/site-data'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -42,14 +44,9 @@ export default function Header() {
     opacity: 0,
   })
   const [hoveredHref, setHoveredHref] = useState<string | null>(null)
-  const [brandFlip, setBrandFlip] = useState(false)
   const currentPath = normalizeNavPath(pathname)
-
-  // Logo text swap RU ⇄ EN every 4s
-  useEffect(() => {
-    const id = setInterval(() => setBrandFlip((v) => !v), 4000)
-    return () => clearInterval(id)
-  }, [])
+  const locale = useSiteLocale(currentPath)
+  const descriptorLines = brand.descriptorLines[locale]
 
   // Scroll handler — scrolled state + progress bar
   useEffect(() => {
@@ -152,7 +149,7 @@ export default function Header() {
       {/* ─── MAIN BAR ─────────────────────────────────────────── */}
       <div
         className={`container mx-auto px-5 transition-all duration-500 ease-out sm:px-6 lg:px-8 ${
-          scrolled || mobileOpen ? 'py-3' : 'py-5'
+          scrolled ? 'py-5 lg:py-3' : 'py-5'
         }`}
       >
         <div className="relative flex items-center gap-4 lg:gap-6">
@@ -160,12 +157,12 @@ export default function Header() {
           {/* ── LOGO ─────────────────────────────────────────── */}
           <Link
             href="/"
-            className="group relative flex shrink-0 items-center gap-3"
+            className="group relative flex min-w-0 shrink-0 items-center gap-3"
             aria-label="ЕМ-ПСП — главная"
           >
             <span
               className={`relative grid shrink-0 place-items-center transition-all duration-500 ease-out ${
-                scrolled ? 'h-10 w-10' : 'h-[50px] w-[50px]'
+                scrolled ? 'h-[50px] w-[50px] lg:h-10 lg:w-10' : 'h-[50px] w-[50px]'
               }`}
             >
               {/* Pulse ring on hover */}
@@ -180,53 +177,28 @@ export default function Header() {
                 width={40}
                 height={40}
                 className={`object-contain transition-all duration-500 ${
-                  scrolled ? 'h-9 w-9' : 'h-11 w-11'
+                  scrolled ? 'h-11 w-11 lg:h-9 lg:w-9' : 'h-11 w-11'
                 }`}
               />
             </span>
-            <span className="flex flex-col overflow-hidden">
+            <span className="flex min-w-0 flex-col">
               <span
-                className={`relative font-brand font-black leading-none text-white transition-all duration-500 ease-out tracking-[-0.01em] ${
-                  scrolled ? 'text-[17px] h-[17px]' : 'text-[20px] h-[20px]'
+                className={`font-brand font-black leading-none text-white transition-all duration-500 ease-out tracking-[-0.01em] ${
+                  scrolled ? 'text-[20px] lg:text-[17px]' : 'text-[20px]'
                 }`}
-                style={{ width: scrolled ? 80 : 96 }}
               >
-                <span
-                  className={`absolute inset-0 transition-all duration-500 ease-out ${
-                    brandFlip ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
-                  }`}
-                >
-                  ЕМ-ПСП
-                </span>
-                <span
-                  className={`absolute inset-0 transition-all duration-500 ease-out ${
-                    brandFlip ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-                  }`}
-                >
-                  EM-PCP
-                </span>
+                {brand.short}
               </span>
               <span
-                className={`relative hidden whitespace-nowrap font-bold uppercase text-[#8ab0a3]/72 transition-all duration-500 ease-out sm:block lg:hidden xl:block ${
+                className={`hidden max-w-[260px] grid-cols-1 font-bold uppercase leading-[1.25] text-[#8ab0a3]/72 transition-all duration-500 ease-out xl:grid ${
                   scrolled
-                    ? 'mt-0.5 text-[8px] tracking-[0.26em] h-[9px]'
-                    : 'mt-1.5 text-[9px] tracking-[0.28em] h-[10px]'
+                    ? 'mt-0.5 gap-0 text-[8px] tracking-[0.14em]'
+                    : 'mt-1.5 gap-0.5 text-[9px] tracking-[0.15em]'
                 }`}
               >
-                <span
-                  className={`absolute inset-0 transition-all duration-500 ease-out ${
-                    brandFlip ? 'opacity-0 -translate-y-1' : 'opacity-100 translate-y-0'
-                  }`}
-                >
-                  Инженерные · Проекты · Строительство
-                </span>
-                <span
-                  className={`absolute inset-0 transition-all duration-500 ease-out ${
-                    brandFlip ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
-                  }`}
-                >
-                  Engineering · Project · Construction
-                </span>
+                {descriptorLines.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
               </span>
             </span>
           </Link>
@@ -336,22 +308,22 @@ export default function Header() {
               onClick={() => setMobileOpen((v) => !v)}
               aria-label={mobileOpen ? 'Закрыть меню' : 'Открыть меню'}
               aria-expanded={mobileOpen}
-              className="relative grid h-10 w-10 place-items-center border border-white/14 bg-white/[0.04] transition-all duration-300 hover:border-[#5f8b7d]/50 hover:bg-[#5f8b7d]/10 lg:hidden"
+              className="relative grid h-11 w-11 shrink-0 place-items-center border border-white/14 bg-white/[0.04] transition-all duration-300 hover:border-[#5f8b7d]/50 hover:bg-[#5f8b7d]/10 lg:hidden"
             >
-              <span className="relative h-[14px] w-5">
+              <span className="relative block h-[18px] w-[22px]">
                 <span
-                  className={`absolute left-0 top-0 h-px w-5 bg-white transition-all duration-300 ${
-                    mobileOpen ? 'translate-y-[7px] rotate-45' : ''
+                  className={`absolute left-0 top-[3px] h-px w-[22px] bg-white transition-all duration-300 ${
+                    mobileOpen ? 'translate-y-[6px] rotate-45' : ''
                   }`}
                 />
                 <span
-                  className={`absolute left-0 top-[7px] h-px bg-white transition-all duration-300 ${
-                    mobileOpen ? 'w-0 opacity-0' : 'w-5 opacity-100'
+                  className={`absolute left-0 top-[9px] h-px bg-white transition-all duration-300 ${
+                    mobileOpen ? 'w-0 opacity-0' : 'w-[22px] opacity-100'
                   }`}
                 />
                 <span
-                  className={`absolute bottom-0 left-0 h-px w-5 bg-white transition-all duration-300 ${
-                    mobileOpen ? '-translate-y-[7px] -rotate-45' : ''
+                  className={`absolute bottom-[3px] left-0 h-px w-[22px] bg-white transition-all duration-300 ${
+                    mobileOpen ? '-translate-y-[6px] -rotate-45' : ''
                   }`}
                 />
               </span>
@@ -374,54 +346,37 @@ export default function Header() {
       {/* ─── MOBILE MENU ──────────────────────────────────────── */}
       <div
         className={`overflow-hidden transition-[max-height,opacity] duration-500 ease-out lg:hidden ${
-          mobileOpen ? 'max-h-[720px] opacity-100' : 'max-h-0 opacity-0'
+          mobileOpen ? 'h-[calc(100svh-90px)] max-h-[calc(100svh-90px)] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="relative border-t border-white/8 bg-[#07090f]">
+        <div className="relative h-full border-t border-white/8 bg-[#07090f]">
 
-          <div className="relative px-5 pb-8 pt-6 sm:px-6">
-            {/* Label */}
-            <div className="mb-6 flex items-center gap-4">
-              <span className="text-[10px] font-black tracking-[0.22em] text-[#5f8b7d]">MENU</span>
-              <span className="h-px flex-1 bg-white/[0.08]" />
-              <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-white/32">
-                {navLinks.length} разделов
-              </span>
-            </div>
-
+          <div className="relative h-full overflow-y-auto px-5 pb-[calc(24px+env(safe-area-inset-bottom))] pt-4 sm:px-6">
             <nav className="flex flex-col" aria-label="Мобильная навигация">
               {navLinks.map((link, i) => {
-                const active = pathname === link.href
+                const active = currentPath === link.href
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
+                    onClick={() => setMobileOpen(false)}
                     style={{ transitionDelay: mobileOpen ? `${80 + i * 55}ms` : '0ms' }}
-                    className={`group flex items-center justify-between border-b border-white/[0.08] py-5 transition-all duration-500 ease-out ${
+                    className={`group flex min-h-[58px] items-center justify-between gap-4 border-b border-white/[0.07] py-4 transition-all duration-500 ease-out ${
                       mobileOpen ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
                     }`}
                   >
-                    <div className="flex items-center gap-5">
-                      <span
-                        className={`font-brand text-[10px] font-black tracking-[0.22em] transition-colors ${
-                          active ? 'text-[#8ab0a3]' : 'text-white/28 group-hover:text-[#5f8b7d]'
-                        }`}
-                      >
-                        {link.code}
-                      </span>
-                      <span
-                        className={`font-brand text-[20px] font-black leading-none tracking-[-0.01em] transition-colors ${
-                          active ? 'text-white' : 'text-white/72 group-hover:text-white'
-                        }`}
-                      >
-                        {link.label}
-                      </span>
-                    </div>
                     <span
-                      className={`inline-grid h-8 w-8 place-items-center transition-all duration-300 ${
+                      className={`font-brand text-[21px] font-black leading-none tracking-[-0.01em] transition-colors ${
+                        active ? 'text-[#8ab0a3]' : 'text-white/78 group-hover:text-white'
+                      }`}
+                    >
+                      {link.label}
+                    </span>
+                    <span
+                      className={`inline-grid h-9 w-9 shrink-0 place-items-center transition-all duration-300 ${
                         active
-                          ? 'bg-[#5f8b7d] text-white'
-                          : 'border border-white/12 text-white/48 group-hover:border-[#5f8b7d] group-hover:bg-[#5f8b7d]/10 group-hover:text-white'
+                          ? 'text-[#8ab0a3]'
+                          : 'text-white/46 group-hover:text-white'
                       }`}
                     >
                       <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
@@ -443,7 +398,8 @@ export default function Header() {
             >
               <Link
                 href="/portal"
-                className="group relative inline-flex items-center justify-center gap-2 overflow-hidden border border-[#3E5854] bg-[#3E5854] py-4 text-[11px] font-black uppercase tracking-[0.14em] text-white"
+                onClick={() => setMobileOpen(false)}
+                className="group relative inline-flex min-h-[54px] items-center justify-center gap-2 overflow-hidden border border-[#3E5854] bg-[#3E5854] px-4 py-4 text-center text-[11px] font-black uppercase tracking-[0.14em] text-white"
               >
                 <span
                   aria-hidden="true"
@@ -456,39 +412,33 @@ export default function Header() {
               </Link>
               <a
                 href="tel:+79892888980"
-                className="flex items-center justify-between gap-2 border border-white/10 px-5 py-3.5 text-[13px] font-semibold text-white/78 transition-colors hover:border-white/24 hover:text-white"
+                className="flex min-h-[54px] items-center justify-between gap-3 border border-white/10 px-4 py-3 text-[13px] font-semibold text-white/78 transition-colors hover:border-white/24 hover:text-white"
               >
-                <span className="flex items-center gap-3">
+                <span className="flex min-w-0 items-center gap-3">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                     <path d="M2 2h3l1.5 3.5-1.5 1a8 8 0 0 0 3 3l1-1.5L12.5 9V12a1 1 0 0 1-1 1C4.3 13 1 9.7 1 3a1 1 0 0 1 1-1Z" />
                   </svg>
                   <span className="tabular-nums">+7 (989) 288-89-80</span>
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
-                  Звонок
+                  ЗВОНОК
                 </span>
               </a>
               <a
                 href="mailto:em-psp@mail.ru"
-                className="flex items-center justify-between gap-2 border border-white/10 px-5 py-3.5 text-[13px] font-semibold text-white/78 transition-colors hover:border-white/24 hover:text-white"
+                className="flex min-h-[54px] items-center justify-between gap-3 border border-white/10 px-4 py-3 text-[13px] font-semibold text-white/78 transition-colors hover:border-white/24 hover:text-white"
               >
-                <span className="flex items-center gap-3">
+                <span className="flex min-w-0 items-center gap-3">
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                     <rect x="1.5" y="2.5" width="11" height="9" rx="0.5" />
                     <path d="m2 3 5 4 5-4" />
                   </svg>
-                  <span>em-psp@mail.ru</span>
+                  <span className="min-w-0 break-all">em-psp@mail.ru</span>
                 </span>
                 <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/40">
-                  Письмо
+                  ПИСЬМО
                 </span>
               </a>
-            </div>
-
-            {/* Bottom meta */}
-            <div className="mt-8 flex items-center justify-between border-t border-white/[0.08] pt-5 text-[9px] font-bold uppercase tracking-[0.22em] text-white/32">
-              <span>СРО · ISO · 150+</span>
-              <span>СПб · Краснодар</span>
             </div>
           </div>
         </div>

@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useSiteLocale } from '@/hooks/useSiteLocale'
+import { brand } from '@/lib/site-data'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -10,13 +11,8 @@ interface BrandLogoProps {
 }
 
 export default function BrandLogo({ className = '' }: BrandLogoProps) {
-  const [flip, setFlip] = useState(false)
-
-  // Same 4s interval as Header
-  useEffect(() => {
-    const id = setInterval(() => setFlip((v) => !v), 4000)
-    return () => clearInterval(id)
-  }, [])
+  const locale = useSiteLocale()
+  const descriptorLines = brand.descriptorLines[locale]
 
   return (
     <Link
@@ -40,41 +36,14 @@ export default function BrandLogo({ className = '' }: BrandLogoProps) {
         />
       </span>
 
-      <span className="flex flex-col overflow-hidden">
-        {/* Brand name — ЕМ-ПСП ↔ EM-PCP */}
-        <span className="relative h-[20px] w-24 font-brand text-[20px] font-black leading-none tracking-[-0.01em] text-white">
-          <span
-            className={`absolute inset-0 transition-all duration-500 ease-out ${
-              flip ? 'opacity-0 -translate-y-2' : 'opacity-100 translate-y-0'
-            }`}
-          >
-            ЕМ-ПСП
-          </span>
-          <span
-            className={`absolute inset-0 transition-all duration-500 ease-out ${
-              flip ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
-            }`}
-          >
-            EM-PCP
-          </span>
+      <span className="flex min-w-0 flex-col">
+        <span className="font-brand text-[20px] font-black leading-none tracking-[-0.01em] text-white">
+          {brand.short}
         </span>
-
-        {/* Descriptor — RU ↔ EN */}
-        <span className="relative mt-1.5 h-[10px] whitespace-nowrap text-[9px] font-bold uppercase tracking-[0.28em] text-[#8ab0a3]/72">
-          <span
-            className={`absolute inset-0 transition-all duration-500 ease-out ${
-              flip ? 'opacity-0 -translate-y-1' : 'opacity-100 translate-y-0'
-            }`}
-          >
-            Инженерные · Проекты · Строительство
-          </span>
-          <span
-            className={`absolute inset-0 transition-all duration-500 ease-out ${
-              flip ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'
-            }`}
-          >
-            Engineering · Project · Construction
-          </span>
+        <span className="mt-1.5 grid max-w-[260px] grid-cols-1 text-[9px] font-bold uppercase leading-[1.25] tracking-[0.15em] text-[#8ab0a3]/72">
+          {descriptorLines.map((line) => (
+            <span key={line}>{line}</span>
+          ))}
         </span>
       </span>
     </Link>

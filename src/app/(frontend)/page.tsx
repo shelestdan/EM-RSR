@@ -62,6 +62,25 @@ const Arrow = () => (
   </svg>
 )
 
+const PhoneIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+    <path d="M2 2h3l1.5 3.5-1.5 1a8 8 0 0 0 3 3l1-1.5L12.5 9V12a1 1 0 0 1-1 1C4.3 13 1 9.7 1 3a1 1 0 0 1 1-1Z" />
+  </svg>
+)
+
+const MailIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+    <rect x="1.5" y="2.5" width="11" height="9" rx="0.5" />
+    <path d="m2 3 5 4 5-4" />
+  </svg>
+)
+
+const MaxIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+    <path d="M12 7a5 5 0 1 1-2-4l2-1v4H8" />
+  </svg>
+)
+
 export default function HomePage() {
   return (
     <>
@@ -329,33 +348,49 @@ export default function HomePage() {
                 На основе исчерпывающих исходных данных мы точно определяем состав работ, оцениваем риски и находим решения — в том числе в нестандартных случаях, где другие видят тупик.
               </p>
 
-              <div className="mt-12">
+              <div className="mt-12 grid gap-3">
                 {([
-                  { label: 'Телефон', value: brand.phone, href: brand.phoneHref },
-                  { label: 'MAX', value: 'Написать в MAX', href: brand.maxHref, external: true },
-                  { label: 'Email', value: brand.email, href: brand.emailHref },
-                  { label: 'Режим работы', value: brand.workingHours, href: null },
-                ] as { label: string; value: string; href: string | null; external?: boolean }[]).map(({ label, value, href, external }) => (
-                  <div key={label} className="flex items-start gap-4 border-t border-white/[0.08] py-5">
+                  { label: 'Телефон', value: brand.phone, href: brand.phoneHref, action: 'ЗВОНОК', icon: <PhoneIcon /> },
+                  { label: 'Email', value: brand.email, href: brand.emailHref, action: 'ПИСЬМО', icon: <MailIcon /> },
+                  { label: 'MAX', value: 'Написать в MAX', href: brand.maxHref, action: 'ЧАТ', icon: <MaxIcon />, external: true },
+                ]).map(({ label, value, href, action, icon, external }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener noreferrer' : undefined}
+                    className="group flex min-h-[58px] items-center justify-between gap-3 border border-white/10 px-4 py-3 transition-colors hover:border-white/24"
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center border border-white/10 text-[#8ab0a3] transition-colors group-hover:border-[#8ab0a3]/40">
+                        {icon}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-white/24">
+                          {label}
+                        </span>
+                        <span className={`mt-1 block text-[15px] font-semibold leading-[1.28] text-white/72 transition-colors group-hover:text-white ${label === 'Email' ? 'break-all' : 'tabular-nums'}`}>
+                          {value}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-[10px] font-black uppercase tracking-[0.16em] text-white/36">
+                      {action}
+                    </span>
+                  </a>
+                ))}
+
+                <div className="border border-white/10 px-4 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <div className="mb-1 text-[9px] font-black uppercase tracking-[0.2em] text-white/24">
-                        {label}
+                        Режим работы
                       </div>
-                      {href ? (
-                        <a
-                          href={href}
-                          target={external ? '_blank' : undefined}
-                          rel={external ? 'noopener noreferrer' : undefined}
-                          className="text-[15px] font-medium text-white/72 transition-colors hover:text-white"
-                        >
-                          {value}
-                        </a>
-                      ) : (
-                        <p className="text-[15px] text-white/56">{value}</p>
-                      )}
+                      <p className="text-[15px] font-semibold text-white/56">{brand.workingHours}</p>
                     </div>
+                    <p className="text-[11px] font-semibold text-white/34">Время московское</p>
                   </div>
-                ))}
+                </div>
               </div>
 
             </ScrollReveal>

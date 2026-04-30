@@ -5,7 +5,11 @@ export const brand = {
   short: 'EM-PCP',
   shortRu: 'ЕМ-ПСП',
   descriptor: 'Engineering Mechanisms Project Construction +',
-  descriptorRu: 'Инженерные механизмы · Проекты · Строительство',
+  descriptorRu: 'Инженерное искусство механизмов проектирования и строительства +',
+  descriptorLines: {
+    ru: ['Инженерное искусство механизмов', 'проектирования и строительства +'],
+    en: ['Engineering Mechanisms', 'Project Construction +'],
+  },
   legalName: 'ООО «ЕМ-ПСП»',
   inn: '7801724375',
   kpp: '780101001',

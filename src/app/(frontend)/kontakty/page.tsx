@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { ReactNode } from 'react'
 import LeadForm from '@/components/LeadForm'
 import OfficeMapTabs from '@/components/OfficeMapTabs'
 import ScrollReveal from '@/components/ScrollReveal'
@@ -63,76 +64,38 @@ export default function ContactsPage() {
             </div>
           </ScrollReveal>
 
-          {/* Phone card — big */}
-          <div className="grid gap-px bg-[#d9d6cb] lg:grid-cols-2">
-
-            {/* Phone + MAX */}
-            <ScrollReveal className="h-full">
-              <div className="flex h-full flex-col justify-between gap-10 bg-white p-8 sm:p-10">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
-                      <PhoneIcon />
+          <div className="grid gap-px bg-[#d9d6cb] lg:grid-cols-3">
+            {([
+              { label: 'Телефон', value: brand.phone, href: brand.phoneHref, action: 'ЗВОНОК', icon: <PhoneIcon /> },
+              { label: 'Почта', value: brand.email, href: brand.emailHref, action: 'ПИСЬМО', icon: <MailIcon /> },
+              { label: 'MAX', value: 'Написать в MAX', href: brand.maxHref, action: 'ЧАТ', icon: <MaxIcon />, external: true },
+            ] as { label: string; value: string; href: string; action: string; icon: ReactNode; external?: boolean }[]).map((item, i) => (
+              <ScrollReveal key={item.label} className={`h-full reveal-delay-${i + 1}`}>
+                <a
+                  href={item.href}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
+                  className="group flex h-full min-h-[132px] items-center justify-between gap-4 bg-white p-5 transition-colors hover:bg-[#f6f5f1] sm:min-h-[150px] sm:p-7"
+                >
+                  <span className="flex min-w-0 items-center gap-4">
+                    <span className="inline-grid h-12 w-12 shrink-0 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854] transition-colors group-hover:border-[#3E5854]/40">
+                      {item.icon}
                     </span>
-                    <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">Телефон</p>
-                  </div>
-                  <a
-                    href={brand.maxHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-4 transition-colors hover:text-[#23273F]"
-                  >
-                    <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
-                      <MaxIcon />
+                    <span className="min-w-0">
+                      <span className="block text-[10px] font-black uppercase tracking-[0.18em] text-[#626675]/60">
+                        {item.label}
+                      </span>
+                      <span className={`mt-2 block font-brand text-[18px] font-black leading-[1.16] text-[#23273F] ${item.label === 'Почта' ? 'break-all' : 'tabular-nums'}`}>
+                        {item.value}
+                      </span>
                     </span>
-                    <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">MAX</p>
-                  </a>
-                </div>
-                <div>
-                  <a
-                    href={brand.phoneHref}
-                    className="block font-brand font-black text-[#23273F] tabular-nums transition-colors hover:text-[#3E5854]"
-                    style={{ fontSize: 'clamp(28px, 3.4vw, 42px)', letterSpacing: '-0.01em' }}
-                  >
-                    {brand.phone}
-                  </a>
-                  <p className="mt-2 text-[14px] leading-[1.65] text-[#626675]">
-                    По всем вопросам
-                  </p>
-                </div>
-              </div>
-            </ScrollReveal>
-
-            {/* Email */}
-            <ScrollReveal className="h-full">
-              <div className="flex h-full flex-col justify-between gap-10 bg-white p-8 sm:p-10">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
-                      <MailIcon />
-                    </span>
-                    <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">Почта</p>
-                  </div>
-                  <div className="flex items-center gap-4 opacity-0" aria-hidden="true">
-                    <span className="inline-grid h-12 w-12 place-items-center border border-[#d9d6cb] bg-[#f6f5f1] text-[#3E5854]">
-                      <MaxIcon />
-                    </span>
-                    <p className="text-[15px] font-black uppercase tracking-[0.14em] text-[#23273F]">MAX</p>
-                  </div>
-                </div>
-                <div>
-                  <a
-                    href={brand.emailHref}
-                    className="block font-brand font-black text-[#23273F] transition-colors hover:text-[#3E5854]"
-                    style={{ fontSize: 'clamp(28px, 3.4vw, 42px)', letterSpacing: '-0.01em' }}
-                  >
-                    {brand.email}
-                  </a>
-                  <p className="mt-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#626675]/60">Срок</p>
-                  <p className="mt-1 text-[15px] font-semibold leading-[1.5] text-[#23273F]">{brand.sla}</p>
-                </div>
-              </div>
-            </ScrollReveal>
+                  </span>
+                  <span className="shrink-0 text-[10px] font-black uppercase tracking-[0.16em] text-[#3E5854]">
+                    {item.action}
+                  </span>
+                </a>
+              </ScrollReveal>
+            ))}
           </div>
 
           {/* Work hours strip */}
@@ -166,33 +129,49 @@ export default function ContactsPage() {
                 На основе исчерпывающих исходных данных мы точно определяем состав работ, оцениваем риски и находим решения — в том числе в нестандартных случаях, где другие видят тупик.
               </p>
 
-              <div className="mt-12">
+              <div className="mt-12 grid gap-3">
                 {([
-                  { label: 'Телефон', value: brand.phone, href: brand.phoneHref },
-                  { label: 'MAX', value: 'Написать в MAX', href: brand.maxHref, external: true },
-                  { label: 'Email', value: brand.email, href: brand.emailHref },
-                  { label: 'Режим работы', value: brand.workingHours, href: null },
-                ] as { label: string; value: string; href: string | null; external?: boolean }[]).map(({ label, value, href, external }) => (
-                  <div key={label} className="flex items-start gap-4 border-t border-white/[0.08] py-5">
+                  { label: 'Телефон', value: brand.phone, href: brand.phoneHref, action: 'ЗВОНОК', icon: <PhoneIcon /> },
+                  { label: 'Email', value: brand.email, href: brand.emailHref, action: 'ПИСЬМО', icon: <MailIcon /> },
+                  { label: 'MAX', value: 'Написать в MAX', href: brand.maxHref, action: 'ЧАТ', icon: <MaxIcon />, external: true },
+                ]).map(({ label, value, href, action, icon, external }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noopener noreferrer' : undefined}
+                    className="group flex min-h-[58px] items-center justify-between gap-3 border border-white/10 px-4 py-3 transition-colors hover:border-white/24"
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="grid h-9 w-9 shrink-0 place-items-center border border-white/10 text-[#8ab0a3] transition-colors group-hover:border-[#8ab0a3]/40">
+                        {icon}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-white/24">
+                          {label}
+                        </span>
+                        <span className={`mt-1 block text-[15px] font-semibold leading-[1.28] text-white/72 transition-colors group-hover:text-white ${label === 'Email' ? 'break-all' : 'tabular-nums'}`}>
+                          {value}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-[10px] font-black uppercase tracking-[0.16em] text-white/36">
+                      {action}
+                    </span>
+                  </a>
+                ))}
+
+                <div className="border border-white/10 px-4 py-3">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <div className="mb-1 text-[9px] font-black uppercase tracking-[0.2em] text-white/24">
-                        {label}
+                        Режим работы
                       </div>
-                      {href ? (
-                        <a
-                          href={href}
-                          target={external ? '_blank' : undefined}
-                          rel={external ? 'noopener noreferrer' : undefined}
-                          className="text-[15px] font-medium text-white/72 transition-colors hover:text-white"
-                        >
-                          {value}
-                        </a>
-                      ) : (
-                        <p className="text-[15px] text-white/56">{value}</p>
-                      )}
+                      <p className="text-[15px] font-semibold text-white/56">{brand.workingHours}</p>
                     </div>
+                    <p className="text-[11px] font-semibold text-white/34">Время московское</p>
                   </div>
-                ))}
+                </div>
               </div>
             </ScrollReveal>
 
