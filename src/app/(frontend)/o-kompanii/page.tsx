@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import ScrollReveal from '@/components/ScrollReveal'
 import CopyNumber from '@/components/CopyNumber'
+import CertificatePreviewCard from '@/components/CertificatePreviewCard'
 import { pageMetadata } from '@/lib/seo'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
@@ -179,36 +180,12 @@ export default function AboutPage() {
           <div className="mt-3 grid gap-px bg-[#d9d6cb] md:grid-cols-3">
             {certDocs.map((cert) => (
               <ScrollReveal key={cert.code_full}>
-                <a
-                  href={`${BASE}${cert.pdfUrl}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                  className="group flex h-full flex-col bg-white p-7 transition-colors duration-300 hover:bg-[#f6f5f1] sm:p-8"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-brand text-[18px] font-black leading-tight text-[#23273F]">
-                        {cert.code_full}
-                      </h3>
-                      <p className="mt-2 text-[13px] leading-[1.65] text-[#626675]">{cert.sublabel}</p>
-                    </div>
-                    <div className="shrink-0 w-[72px] overflow-hidden border border-[#d9d6cb] shadow-sm transition-shadow duration-300 group-hover:shadow-md">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={`${BASE}${cert.previewUrl}`}
-                        alt={`Сертификат ${cert.code_full}, первая страница`}
-                        width={144}
-                        height={204}
-                        className="block w-full"
-                        loading="lazy"
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-auto pt-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-all group-hover:gap-3">
-                    Открыть сертификат <Arrow />
-                  </div>
-                </a>
+                <CertificatePreviewCard
+                  title={cert.code_full}
+                  sublabel={cert.sublabel}
+                  pdfUrl={`${BASE}${cert.pdfUrl}`}
+                  previewUrl={`${BASE}${cert.previewUrl}`}
+                />
               </ScrollReveal>
             ))}
           </div>
@@ -216,8 +193,7 @@ export default function AboutPage() {
           {/* ISO 9001 text block */}
           <ScrollReveal>
             <div className="mt-3 border border-[#d9d6cb] bg-[#f6f5f1] p-7 sm:p-10">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#3E5854]">ISO 9001</p>
-              <div className="mt-5 space-y-4 text-[15px] leading-[1.78] text-[#626675]">
+              <div className="space-y-4 text-[15px] leading-[1.78] text-[#626675]">
                 <p><strong className="font-bold text-[#23273F]">ISO 9001</strong> — это не просто сертификат. Это задокументированная система контроля качества на каждом этапе проектирования.</p>
                 <p>Мы не ограничиваемся формальным соблюдением нормативов. Стандарт подтверждает, что качество закладывается в процессы изначально: многоуровневая проверка решений, чёткая фиксация ответственности и минимизация ошибок ещё на этапе документации.</p>
                 <p>Это гарантия того, что наши проекты не просто соответствуют СП, ГОСТ и СНиП, а работают с запасом надёжности — без непредвиденных расходов и доработок при строительстве.</p>
@@ -228,8 +204,7 @@ export default function AboutPage() {
           {/* ISO 14001 text block */}
           <ScrollReveal>
             <div className="mt-3 border border-[#d9d6cb] bg-[#f6f5f1] p-7 sm:p-10">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#3E5854]">ISO 14001</p>
-              <div className="mt-5 space-y-4 text-[15px] leading-[1.78] text-[#626675]">
+              <div className="space-y-4 text-[15px] leading-[1.78] text-[#626675]">
                 <p><strong className="font-bold text-[#23273F]">ISO 14001</strong> — это не просто сертификат. Это наша система экологического менеджмента.</p>
                 <p>Мы минимизируем воздействие на окружающую среду через:</p>
                 <ul className="ml-5 list-disc space-y-2">
@@ -245,8 +220,7 @@ export default function AboutPage() {
           {/* ISO 45001 text block */}
           <ScrollReveal>
             <div className="mt-3 border border-[#d9d6cb] bg-[#f6f5f1] p-7 sm:p-10">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#3E5854]">ISO 45001</p>
-              <div className="mt-5 space-y-4 text-[15px] leading-[1.78] text-[#626675]">
+              <div className="space-y-4 text-[15px] leading-[1.78] text-[#626675]">
                 <p><strong className="font-bold text-[#23273F]">ISO 45001</strong> — это не просто сертификат. Это система охраны труда и здоровья.</p>
                 <p>Мы закладываем безопасность в проект ещё на этапе документации. Это гарантирует, что наши инженерные решения минимизируют риски для строителей на площадке и эксплуатантов в будущем.</p>
                 <p>Для нас безопасность людей — приоритет. Мы соблюдаем строгие стандарты, чтобы работа выполнялась без аварий и травм.</p>

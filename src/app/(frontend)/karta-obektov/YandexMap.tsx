@@ -280,6 +280,12 @@ function buildIconHtml(cat: string): string {
 // POPUP CSS
 // ─────────────────────────────────────────────────────────────
 const POPUP_STYLES = `
+.leaflet-container img.leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
+  width: 256px !important;
+  height: 256px !important;
+}
 .leaflet-popup {
   max-width: calc(100vw - 32px) !important;
 }
@@ -599,6 +605,7 @@ interface YandexMapProps {
 export default function YandexMap({ initialMarkers, showFilters = true }: YandexMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
+  const tileLayerRef = useRef<any>(null)
   const markersRef = useRef<any[]>([])
   // Always-current ref avoids stale closures in Leaflet async callbacks
   const filterFnRef = useRef<(m: MapMarkerData) => boolean>(() => true)
@@ -666,11 +673,28 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
   useEffect(() => {
     if (!mapReady || !mapInstanceRef.current) return
-    const timers = [
-      window.setTimeout(() => mapInstanceRef.current?.invalidateSize?.(), 60),
-      window.setTimeout(() => mapInstanceRef.current?.invalidateSize?.(), 360),
-    ]
-    return () => timers.forEach((timer) => window.clearTimeout(timer))
+    const map = mapInstanceRef.current
+    const refreshMap = () => {
+      if (!mapInstanceRef.current) return
+      const center = map.getCenter()
+      const zoom = map.getZoom()
+      map.invalidateSize({ animate: false, pan: false })
+      map.setView(center, zoom, { animate: false })
+      tileLayerRef.current?.redraw?.()
+    }
+
+    let secondFrame: number | null = null
+    const firstFrame = window.requestAnimationFrame(() => {
+      refreshMap()
+      secondFrame = window.requestAnimationFrame(refreshMap)
+    })
+    const timers = [80, 240, 520, 900].map((delay) => window.setTimeout(refreshMap, delay))
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame)
+      if (secondFrame !== null) window.cancelAnimationFrame(secondFrame)
+      timers.forEach((timer) => window.clearTimeout(timer))
+    }
   }, [isFullscreen, mapReady])
 
   // ─── Init map (once) ───────────────────────────────────────
@@ -699,7 +723,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
         attributionControl: false,
       })
 
-      L.tileLayer(
+      const tileLayer = L.tileLayer(
         'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
         {
           attribution:
@@ -708,6 +732,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
           maxZoom: 20,
         },
       ).addTo(map)
+      tileLayerRef.current = tileLayer
 
       L.control.attribution({ position: 'bottomright', prefix: false }).addTo(map)
 
@@ -721,6 +746,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
         map.getContainer().removeEventListener('click', onPopupCloseClick)
         map.remove()
         mapInstanceRef.current = null
+        tileLayerRef.current = null
       }
 
       mapInstanceRef.current = map
@@ -914,7 +940,9 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
       {/* ─── MAP CANVAS ──────────────────────────────────────── */}
       <div className={`container-wide mx-auto px-5 sm:px-6 lg:px-8 ${isFullscreen ? 'pt-4 sm:pt-5' : 'pt-10'}`}>
         <div className="relative overflow-hidden border border-[#d9d6cb] bg-white shadow-[0_40px_120px_rgba(13,16,28,0.14)]">
-          <div ref={mapRef} className={isFullscreen ? 'h-[72svh] min-h-[420px] w-full sm:h-[76svh]' : 'h-[62vh] min-h-[420px] w-full sm:h-[72vh] sm:min-h-[560px]'} />
+          <div className={isFullscreen ? 'h-[72svh] min-h-[420px] w-full sm:h-[76svh]' : 'h-[62vh] min-h-[420px] w-full sm:h-[72vh] sm:min-h-[560px]'}>
+            <div ref={mapRef} className="h-full w-full" />
+          </div>
           <button
             type="button"
             onClick={() => setIsFullscreen((value) => !value)}
