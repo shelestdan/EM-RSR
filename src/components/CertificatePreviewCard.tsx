@@ -71,18 +71,21 @@ export default function CertificatePreviewCard({
           </button>
         </div>
 
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-6">
+        <div className="mt-auto flex flex-nowrap items-center justify-between gap-3 pt-6">
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.14em] text-[#3E5854] transition-all hover:gap-3 hover:text-[#23273F] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854]"
+            className="group/open flex min-w-0 items-center gap-2 whitespace-nowrap text-[10px] font-black uppercase tracking-[0.12em] text-[#3E5854] transition-colors hover:text-[#23273F] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854]"
           >
-            Открыть сертификат <Arrow />
+            <span className="min-w-0">Открыть сертификат</span>
+            <span className="shrink-0 transition-transform duration-200 group-hover/open:translate-x-1">
+              <Arrow />
+            </span>
           </button>
           <a
             href={pdfUrl}
             download
-            className="inline-flex items-center justify-center border border-[#d9d6cb] px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] text-[#23273F] transition-colors hover:border-[#3E5854] hover:text-[#3E5854] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854]"
+            className="inline-flex shrink-0 items-center justify-center border border-[#d9d6cb] px-4 py-3 text-[10px] font-black uppercase tracking-[0.14em] text-[#23273F] transition-colors hover:border-[#3E5854] hover:text-[#3E5854] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854]"
           >
             Скачать
           </a>
@@ -99,8 +102,8 @@ export default function CertificatePreviewCard({
             if (event.target === event.currentTarget) setOpen(false)
           }}
         >
-          <div className="mx-auto grid min-h-[calc(100svh-40px)] max-w-[1180px] gap-4 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start">
-            <div className="flex min-h-[calc(100svh-40px)] items-center justify-center bg-[#f6f5f1] p-3 sm:p-5">
+          <div className="relative mx-auto flex min-h-[calc(100svh-40px)] w-full flex-col items-center justify-center gap-4">
+            <div className="flex min-h-[calc(100svh-40px)] w-full max-w-[760px] items-center justify-center bg-[#f6f5f1] p-3 sm:p-5 lg:fixed lg:left-1/2 lg:top-1/2 lg:h-[calc(100svh-64px)] lg:min-h-0 lg:-translate-x-1/2 lg:-translate-y-1/2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={previewUrl}
@@ -111,7 +114,7 @@ export default function CertificatePreviewCard({
               />
             </div>
 
-            <aside className="bg-white p-5 shadow-[0_22px_70px_rgba(0,0,0,0.24)] lg:sticky lg:top-8">
+            <aside className="w-full bg-white p-5 shadow-[0_22px_70px_rgba(0,0,0,0.24)] sm:w-[300px] lg:fixed lg:right-8 lg:top-8 lg:w-[260px]">
               <button
                 type="button"
                 onClick={() => setOpen(false)}
