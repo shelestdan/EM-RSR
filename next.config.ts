@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BASE_PATH: isGithubPages ? '/EM-RSR' : '',
   },
   devIndicators: false,
+  poweredByHeader: false,
   experimental: {
     reactCompiler: false,
   },

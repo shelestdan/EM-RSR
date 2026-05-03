@@ -66,11 +66,6 @@ const heroRows: Record<SiteLocale, AcronymRow[]> = {
   ],
 }
 
-const labelsByLocale: Record<SiteLocale, string> = {
-  ru: 'ЕМ-ПСП: Единство, Механизмов, Проектирование, Строительство, Плюс',
-  en: 'EM-PCP: Engineering, Mechanisms, Project, Construction, Plus',
-}
-
 function AcronymTable({ locale }: { locale: SiteLocale }) {
   return (
     <div className="divide-y divide-[#e8e5e0] w-full">
@@ -105,9 +100,11 @@ export default function HeroAcronym({ locale: forcedLocale }: { locale?: SiteLoc
   const locale = forcedLocale || animatedLocale
 
   return (
-    <h1 className="w-full" aria-label={labelsByLocale[locale]}>
-      <span className="sr-only">{labelsByLocale[locale]}</span>
-      <span className="grid" aria-hidden="true">
+    <>
+      <h1 className="sr-only">
+        ЕМ-ПСП — инженерное проектирование, строительство и сопровождение инженерных объектов
+      </h1>
+      <div className="grid w-full" aria-hidden="true">
         {(['ru', 'en'] as const).map((entry) => (
           <span
             key={entry}
@@ -120,7 +117,7 @@ export default function HeroAcronym({ locale: forcedLocale }: { locale?: SiteLoc
             <AcronymTable locale={entry} />
           </span>
         ))}
-      </span>
-    </h1>
+      </div>
+    </>
   )
 }
