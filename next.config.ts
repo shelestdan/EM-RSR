@@ -11,6 +11,8 @@ const cspHeader = [
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
   "connect-src 'self' https:",
+  "frame-src 'self' https://yandex.ru https://*.yandex.ru https://yandex.com https://*.yandex.com",
+  "child-src 'self' https://yandex.ru https://*.yandex.ru https://yandex.com https://*.yandex.com",
   "media-src 'self' blob: data:",
   "object-src 'none'",
   "base-uri 'self'",
