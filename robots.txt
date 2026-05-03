@@ -1,0 +1,9 @@
+User-Agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /portal/
+Disallow: /api/
+Disallow: /privacy-policy
+Disallow: /terms
+
+Sitemap: https://em-pcp.ru/sitemap.xml
