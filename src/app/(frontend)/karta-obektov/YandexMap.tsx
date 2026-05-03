@@ -2,7 +2,15 @@
 
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { mapYears, regions } from '@/lib/site-data'
+import {
+  defaultMapRegions,
+  defaultMapWorkTypes,
+  defaultMapYears,
+  defaultMarkerTypes,
+  type MapFilterOption,
+  type MapWorkTypeOption,
+  type MarkerTypeConfig,
+} from '@/lib/map-filter-options'
 
 // ─────────────────────────────────────────────────────────────
 // DATA SCHEMA — exported so markers-data.ts stays in sync
@@ -34,91 +42,8 @@ export interface MapMarkerData {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// MARKER TYPE CONFIG — single source of truth for:
-//   categories · filter labels · legend · icon shapes · colors
-// ─────────────────────────────────────────────────────────────
-export const MARKER_TYPES: Record<string, {
-  label: string
-  color: string | null
-  /** Geometric shape rendered as marker icon */
-  shape: 'square' | 'circleInCircle' | 'diamond' | 'document' | 'squareInSquare' | 'logo'
-  /** Whether this type appears as a public filter button */
-  publicFilter: boolean
-}> = {
-  combined: {
-    label: 'Проектные работы и изыскательские работы',
-    color: '#1565C0',
-    shape: 'squareInSquare',
-    publicFilter: true,
-  },
-  surveys: {
-    label: 'Инженерные изыскания и кадастр',
-    color: '#2E7D32',
-    shape: 'circleInCircle',
-    publicFilter: true,
-  },
-  water: {
-    label: 'Водоснабжение',
-    color: '#00ACC1',
-    shape: 'square',
-    publicFilter: true,
-  },
-  sewer: {
-    label: 'Канализация',
-    color: '#8D6E63',
-    shape: 'square',
-    publicFilter: true,
-  },
-  gas: {
-    label: 'Газоснабжение',
-    color: '#FBC02D',
-    shape: 'square',
-    publicFilter: true,
-  },
-  electricity: {
-    label: 'Электроснабжение',
-    color: '#7E57C2',
-    shape: 'square',
-    publicFilter: true,
-  },
-  heating: {
-    label: 'Теплотрасса',
-    color: '#E53935',
-    shape: 'square',
-    publicFilter: true,
-  },
-  boiler: {
-    label: 'Котельные',
-    color: '#C62828',
-    shape: 'square',
-    publicFilter: true,
-  },
-  other: {
-    label: 'Иные объекты',
-    color: '#546E7A',
-    shape: 'square',
-    publicFilter: true,
-  },
-  authorSupervision: {
-    label: 'Авторский надзор',
-    color: '#00897B',
-    shape: 'diamond',
-    publicFilter: true,
-  },
-  support: {
-    label: 'Сопровождение',
-    color: '#37474F',
-    shape: 'document',
-    publicFilter: true,
-  },
-  office: {
-    label: 'Офисы',
-    color: null,
-    shape: 'logo',
-    publicFilter: true,
-  },
-}
+// Shared fallback. Admin-managed filters can add/override visible options.
+export const MARKER_TYPES = defaultMarkerTypes
 
 // Backward-compat: map old `type` values to new category keys
 const LEGACY_TYPE_TO_CATEGORY: Record<string, string> = {
@@ -185,16 +110,6 @@ export const OFFICE_MARKERS: MapMarkerData[] = [
   },
 ]
 
-// ─────────────────────────────────────────────────────────────
-// FILTER CONFIG — built from MARKER_TYPES automatically
-// ─────────────────────────────────────────────────────────────
-const DIRECTION_FILTERS = [
-  { value: 'all', label: 'Все направления' },
-  ...Object.entries(MARKER_TYPES)
-    .filter(([, t]) => t.publicFilter)
-    .map(([key, t]) => ({ value: key, label: t.label })),
-]
-
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 function escapeHtml(value: string | number | undefined | null): string {
@@ -215,8 +130,8 @@ function escapeAttr(value: string | undefined | null): string {
 // ─────────────────────────────────────────────────────────────
 const ICON_SIZE = 20
 
-function buildIconHtml(cat: string): string {
-  const t = MARKER_TYPES[cat] || MARKER_TYPES.other
+function buildIconHtml(cat: string, markerTypes: Record<string, MarkerTypeConfig> = MARKER_TYPES): string {
+  const t = markerTypes[cat] || MARKER_TYPES.other
   const color = t.color || '#546E7A'
   const S = ICON_SIZE
   const hover = `onmouseenter="this.style.transform='scale(1.25)'" onmouseleave="this.style.transform='scale(1)'"`
@@ -469,9 +384,12 @@ const POPUP_STYLES = `
 // ─────────────────────────────────────────────────────────────
 // POPUP HTML BUILDER
 // ─────────────────────────────────────────────────────────────
-function buildPopupHtml(marker: MapMarkerData): string {
+function buildPopupHtml(
+  marker: MapMarkerData,
+  markerTypes: Record<string, MarkerTypeConfig> = MARKER_TYPES,
+): string {
   const cat = categoryOf(marker)
-  const t = MARKER_TYPES[cat] || MARKER_TYPES.other
+  const t = markerTypes[cat] || MARKER_TYPES.other
   const color = t.color || '#546E7A'
   const isOffice = cat === 'office'
 
@@ -531,8 +449,14 @@ function buildPopupHtml(marker: MapMarkerData): string {
 // ─────────────────────────────────────────────────────────────
 // LEGEND SHAPE (React JSX)
 // ─────────────────────────────────────────────────────────────
-function LegendShape({ cat }: { cat: string }) {
-  const t = MARKER_TYPES[cat]
+function LegendShape({
+  cat,
+  markerTypes,
+}: {
+  cat: string
+  markerTypes: Record<string, MarkerTypeConfig>
+}) {
+  const t = markerTypes[cat]
   if (!t) return null
   const color = t.color || '#546E7A'
 
@@ -602,6 +526,18 @@ interface YandexMapProps {
   showFilters?: boolean
 }
 
+type MapFilterState = {
+  regions: MapFilterOption[]
+  years: number[]
+  workTypes: MapWorkTypeOption[]
+}
+
+const fallbackFilterState: MapFilterState = {
+  regions: defaultMapRegions,
+  years: defaultMapYears,
+  workTypes: defaultMapWorkTypes,
+}
+
 export default function YandexMap({ initialMarkers, showFilters = true }: YandexMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<any>(null)
@@ -614,8 +550,44 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
   const [yearFilters, setYearFilters] = useState<number[]>([])
   const [regionFilters, setRegionFilters] = useState<string[]>([])
   const [adminMarkers, setAdminMarkers] = useState<MapMarkerData[]>([])
+  const [mapFilters, setMapFilters] = useState<MapFilterState>(fallbackFilterState)
   const [mapReady, setMapReady] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
+
+  const markerTypes = useMemo<Record<string, MarkerTypeConfig>>(() => {
+    const dynamicTypes = Object.fromEntries(
+      mapFilters.workTypes.map((type) => [
+        type.value,
+        {
+          label: type.label,
+          color: type.color,
+          shape: type.shape,
+          publicFilter: type.publicFilter,
+        },
+      ]),
+    )
+
+    return {
+      ...MARKER_TYPES,
+      ...dynamicTypes,
+      office: MARKER_TYPES.office,
+    }
+  }, [mapFilters.workTypes])
+
+  const regionFilterButtons = useMemo(
+    () => [{ value: 'all', label: 'Все регионы' }, ...mapFilters.regions],
+    [mapFilters.regions],
+  )
+
+  const directionFilterButtons = useMemo(
+    () => [
+      { value: 'all', label: 'Все направления' },
+      ...mapFilters.workTypes
+        .filter((type) => type.publicFilter)
+        .map((type) => ({ value: type.value, label: type.label })),
+    ],
+    [mapFilters.workTypes],
+  )
 
   const sourceMarkers = useMemo(
     () => [...initialMarkers, ...adminMarkers],
@@ -642,6 +614,20 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
   useEffect(() => {
     let cancelled = false
+
+    fetch(`${BASE}/api/map-filters`, { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() : fallbackFilterState))
+      .then((data) => {
+        if (cancelled) return
+        setMapFilters({
+          regions: Array.isArray(data.regions) ? data.regions : fallbackFilterState.regions,
+          years: Array.isArray(data.years) ? data.years : fallbackFilterState.years,
+          workTypes: Array.isArray(data.workTypes) ? data.workTypes : fallbackFilterState.workTypes,
+        })
+      })
+      .catch(() => {
+        if (!cancelled) setMapFilters(fallbackFilterState)
+      })
 
     fetch(`${BASE}/api/map-markers`, { cache: 'no-store' })
       .then((response) => (response.ok ? response.json() : { docs: [] }))
@@ -810,7 +796,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
       filtered.forEach((markerData) => {
         const cat = categoryOf(markerData)
-        const type = MARKER_TYPES[cat] || MARKER_TYPES.other
+        const type = markerTypes[cat] || MARKER_TYPES.other
         const isOffice = cat === 'office'
         const S = ICON_SIZE
 
@@ -824,7 +810,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
               lineCap: 'round',
               lineJoin: 'round',
             },
-          ).bindPopup(buildPopupHtml(markerData), {
+          ).bindPopup(buildPopupHtml(markerData, markerTypes), {
             maxWidth: 340,
             closeButton: false,
             autoPan: true,
@@ -836,7 +822,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
         }
 
         const icon = L.divIcon({
-          html: buildIconHtml(cat),
+          html: buildIconHtml(cat, markerTypes),
           className: isOffice ? 'em-leaflet-office-icon' : 'em-leaflet-marker-icon',
           iconSize:   isOffice ? [38, 38]     : [S, S],
           iconAnchor: isOffice ? [19, 38]     : [S / 2, S / 2],
@@ -844,7 +830,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
         })
 
         const marker = L.marker([markerData.lat, markerData.lng], { icon })
-          .bindPopup(buildPopupHtml(markerData), {
+          .bindPopup(buildPopupHtml(markerData, markerTypes), {
             maxWidth: 340,
             closeButton: false,
             autoPan: true,
@@ -855,7 +841,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
         markersRef.current.push(marker)
       })
     })
-  }, [mapReady, filterFn, allMarkers])
+  }, [mapReady, filterFn, allMarkers, markerTypes])
 
   return (
     <section
@@ -893,7 +879,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
             {/* Region filter */}
             <div className="mb-5">
               <div className="flex flex-wrap gap-1.5">
-                {regions.map((region) => {
+                {regionFilterButtons.map((region) => {
                   const active = region.value === 'all'
                     ? regionFilters.length === 0
                     : regionFilters.includes(region.value)
@@ -937,7 +923,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
                 >
                   Все
                 </button>
-                {mapYears.map((year) => {
+                {mapFilters.years.map((year) => {
                   const active = yearFilters.includes(year)
                   return (
                     <button
@@ -960,7 +946,7 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
             {/* Direction filter */}
             <div className="flex flex-wrap gap-1.5">
-              {DIRECTION_FILTERS.map((d) => {
+              {directionFilterButtons.map((d) => {
                 const active = d.value === 'all'
                   ? directionFilters.length === 0
                   : directionFilters.includes(d.value)
@@ -1021,9 +1007,11 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
         {/* ─── LEGEND ──────────────────────────────────────── */}
         <div className="mt-3 grid gap-px bg-[#d9d6cb] grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          {Object.entries(MARKER_TYPES).map(([key, t]) => (
+          {Object.entries(markerTypes)
+            .filter(([, t]) => t.publicFilter)
+            .map(([key, t]) => (
             <div key={key} className="flex items-center gap-2.5 bg-white px-4 py-3.5">
-              <LegendShape cat={key} />
+              <LegendShape cat={key} markerTypes={markerTypes} />
               <span className="text-[11px] font-semibold leading-[1.3] text-[#23273F]">
                 {t.label}
               </span>

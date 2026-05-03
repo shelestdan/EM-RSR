@@ -8,9 +8,9 @@ export const MapMarkers: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     group: 'Карта объектов',
-    defaultColumns: ['title', 'category', 'region', 'year', 'updatedAt'],
+    defaultColumns: ['title', 'workTypeRef', 'regionRef', 'yearRef', 'updatedAt'],
     description:
-      'Метки публичной карты. Добавленные здесь объекты появляются на карте сайта без ручной правки кода.',
+      'Метки публичной карты. Регион, год и направление берутся из админ-списков карты.',
   },
   labels: {
     singular: 'Метка на карте',
@@ -48,6 +48,34 @@ export const MapMarkers: CollectionConfig = {
       },
     },
     {
+      name: 'regionRef',
+      type: 'relationship',
+      label: 'Регион из списка карты',
+      relationTo: 'map-regions',
+      admin: {
+        description: 'Основное поле фильтра региона. Новые регионы создаются в «Регионы карты».',
+      },
+    },
+    {
+      name: 'yearRef',
+      type: 'relationship',
+      label: 'Год из списка карты',
+      relationTo: 'map-years',
+      admin: {
+        description: 'Основное поле фильтра года. Новые годы создаются в «Годы карты».',
+      },
+    },
+    {
+      name: 'workTypeRef',
+      type: 'relationship',
+      label: 'Направление из списка карты',
+      relationTo: 'map-work-types',
+      admin: {
+        description:
+          'Основное поле фильтра направления и иконки. Новые направления создаются в «Направления карты».',
+      },
+    },
+    {
       name: 'type',
       type: 'select',
       label: 'Legacy тип объекта',
@@ -64,8 +92,7 @@ export const MapMarkers: CollectionConfig = {
     {
       name: 'category',
       type: 'select',
-      label: 'Категория / обозначение на карте',
-      required: true,
+      label: 'Fallback категория / обозначение на карте',
       options: [
         { label: 'Проектные работы и изыскательские работы', value: 'combined' },
         { label: 'Инженерные изыскания и кадастр', value: 'surveys' },
@@ -80,7 +107,8 @@ export const MapMarkers: CollectionConfig = {
         { label: 'Сопровождение', value: 'support' },
       ],
       admin: {
-        description: 'Значения и обозначения соответствуют файлу «Обозначение на карте объектов».',
+        description:
+          'Для старых меток без «Направления из списка карты». Новые метки лучше связывать с админ-списком.',
       },
     },
     {
@@ -97,8 +125,7 @@ export const MapMarkers: CollectionConfig = {
     {
       name: 'region',
       type: 'select',
-      label: 'Регион',
-      required: true,
+      label: 'Fallback регион',
       options: [
         { label: 'Краснодарский край', value: 'krasnodar' },
         { label: 'Санкт-Петербург', value: 'spb' },
@@ -107,14 +134,19 @@ export const MapMarkers: CollectionConfig = {
         { label: 'Ставропольский край', value: 'stavropol' },
         { label: 'Другой', value: 'other' },
       ],
+      admin: {
+        description: 'Для старых меток без «Регион из списка карты».',
+      },
     },
     {
       name: 'year',
       type: 'number',
-      label: 'Год',
-      required: true,
+      label: 'Fallback год',
       min: 2000,
-      max: 2030,
+      max: 2035,
+      admin: {
+        description: 'Для старых меток без «Год из списка карты».',
+      },
     },
     {
       name: 'description',

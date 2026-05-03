@@ -72,6 +72,9 @@ export interface Config {
     media: Media;
     services: Service;
     projects: Project;
+    'map-regions': MapRegion;
+    'map-years': MapYear;
+    'map-work-types': MapWorkType;
     'map-markers': MapMarker;
     certificates: Certificate;
     'form-submissions': FormSubmission;
@@ -89,6 +92,9 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'map-regions': MapRegionsSelect<false> | MapRegionsSelect<true>;
+    'map-years': MapYearsSelect<false> | MapYearsSelect<true>;
+    'map-work-types': MapWorkTypesSelect<false> | MapWorkTypesSelect<true>;
     'map-markers': MapMarkersSelect<false> | MapMarkersSelect<true>;
     certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -315,7 +321,69 @@ export interface Project {
   createdAt: string;
 }
 /**
- * Метки публичной карты. Добавленные здесь объекты появляются на карте сайта без ручной правки кода.
+ * Список регионов для фильтра карты. Новые регионы показываются на сайте первыми.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "map-regions".
+ */
+export interface MapRegion {
+  id: number;
+  label: string;
+  /**
+   * Латиница без пробелов. Например: moskovskaya-oblast.
+   */
+  slug: string;
+  /**
+   * Меньше число = выше. При одинаковом порядке новые записи идут первыми.
+   */
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Годы для фильтра карты. Новые годы добавляются в начало списка на сайте.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "map-years".
+ */
+export interface MapYear {
+  id: number;
+  year: number;
+  /**
+   * Меньше число = выше. При одинаковом порядке новые записи идут первыми.
+   */
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Направления/типы работ для фильтра карты, легенды и иконок меток. Новые записи идут первыми.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "map-work-types".
+ */
+export interface MapWorkType {
+  id: number;
+  label: string;
+  /**
+   * Латиница без пробелов. Например: road-design.
+   */
+  slug: string;
+  /**
+   * HEX-цвет. Например: #1565C0.
+   */
+  color?: string | null;
+  shape: 'square' | 'circleInCircle' | 'diamond' | 'document' | 'squareInSquare' | 'logo';
+  publicFilter?: boolean | null;
+  /**
+   * Меньше число = выше. При одинаковом порядке новые записи идут первыми.
+   */
+  sortOrder?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Метки публичной карты. Регион, год и направление берутся из админ-списков карты.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "map-markers".
@@ -332,27 +400,48 @@ export interface MapMarker {
    */
   lng: number;
   /**
+   * Основное поле фильтра региона. Новые регионы создаются в «Регионы карты».
+   */
+  regionRef?: (number | null) | MapRegion;
+  /**
+   * Основное поле фильтра года. Новые годы создаются в «Годы карты».
+   */
+  yearRef?: (number | null) | MapYear;
+  /**
+   * Основное поле фильтра направления и иконки. Новые направления создаются в «Направления карты».
+   */
+  workTypeRef?: (number | null) | MapWorkType;
+  /**
    * Служебное поле для совместимости со старой схемой.
    */
   type?: ('proektirovanie' | 'izyskaniya' | 'nadzor' | 'gasification') | null;
   /**
-   * Значения и обозначения соответствуют файлу «Обозначение на карте объектов».
+   * Для старых меток без «Направления из списка карты». Новые метки лучше связывать с админ-списком.
    */
-  category:
-    | 'combined'
-    | 'surveys'
-    | 'water'
-    | 'sewer'
-    | 'gas'
-    | 'electricity'
-    | 'heating'
-    | 'boiler'
-    | 'other'
-    | 'authorSupervision'
-    | 'support';
+  category?:
+    | (
+        | 'combined'
+        | 'surveys'
+        | 'water'
+        | 'sewer'
+        | 'gas'
+        | 'electricity'
+        | 'heating'
+        | 'boiler'
+        | 'other'
+        | 'authorSupervision'
+        | 'support'
+      )
+    | null;
   contractType?: ('ГЕНПОДРЯД' | 'СУБПОДРЯД' | 'ПО ДОГОВОРУ' | 'В СОСТАВЕ КОМАНДЫ') | null;
-  region: 'krasnodar' | 'spb' | 'lenobl' | 'rostov' | 'stavropol' | 'other';
-  year: number;
+  /**
+   * Для старых меток без «Регион из списка карты».
+   */
+  region?: ('krasnodar' | 'spb' | 'lenobl' | 'rostov' | 'stavropol' | 'other') | null;
+  /**
+   * Для старых меток без «Год из списка карты».
+   */
+  year?: number | null;
   /**
    * Будущее поле popup: выполняемые работы.
    */
@@ -510,6 +599,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'map-regions';
+        value: number | MapRegion;
+      } | null)
+    | ({
+        relationTo: 'map-years';
+        value: number | MapYear;
+      } | null)
+    | ({
+        relationTo: 'map-work-types';
+        value: number | MapWorkType;
       } | null)
     | ({
         relationTo: 'map-markers';
@@ -706,12 +807,50 @@ export interface ProjectsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "map-regions_select".
+ */
+export interface MapRegionsSelect<T extends boolean = true> {
+  label?: T;
+  slug?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "map-years_select".
+ */
+export interface MapYearsSelect<T extends boolean = true> {
+  year?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "map-work-types_select".
+ */
+export interface MapWorkTypesSelect<T extends boolean = true> {
+  label?: T;
+  slug?: T;
+  color?: T;
+  shape?: T;
+  publicFilter?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "map-markers_select".
  */
 export interface MapMarkersSelect<T extends boolean = true> {
   title?: T;
   lat?: T;
   lng?: T;
+  regionRef?: T;
+  yearRef?: T;
+  workTypeRef?: T;
   type?: T;
   category?: T;
   contractType?: T;

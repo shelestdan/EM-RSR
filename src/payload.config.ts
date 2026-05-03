@@ -11,6 +11,9 @@ import { Media } from './collections/Media'
 import { Services } from './collections/Services'
 import { Projects } from './collections/Projects'
 import { MapMarkers } from './collections/MapMarkers'
+import { MapRegions } from './collections/MapRegions'
+import { MapYears } from './collections/MapYears'
+import { MapWorkTypes } from './collections/MapWorkTypes'
 import { Certificates } from './collections/Certificates'
 import { FormSubmissions } from './collections/FormSubmissions'
 import { PortalUsers } from './collections/PortalUsers'
@@ -20,6 +23,11 @@ import { HomePage } from './globals/HomePage'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const payloadSecret = process.env.PAYLOAD_SECRET
+
+if (process.env.NODE_ENV === 'production' && !payloadSecret && !process.env.GITHUB_PAGES) {
+  throw new Error('PAYLOAD_SECRET is required in production')
+}
 
 export default buildConfig({
   admin: {
@@ -37,6 +45,9 @@ export default buildConfig({
     Media,
     Services,
     Projects,
+    MapRegions,
+    MapYears,
+    MapWorkTypes,
     MapMarkers,
     Certificates,
     FormSubmissions,
@@ -46,7 +57,7 @@ export default buildConfig({
   ],
   globals: [HomePage],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || 'fallback-secret-change-me',
+  secret: payloadSecret || 'fallback-secret-change-me',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },

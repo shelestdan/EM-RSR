@@ -1,4 +1,6 @@
 // EM-PCP brand config. Requisites kept as «ООО «ЕМ-ПСП»»; public brand = EM-PCP.
+import { defaultMapRegions, defaultMapYears } from './map-filter-options'
+
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 export const brand = {
@@ -140,14 +142,9 @@ export const projectTypes = [
 ]
 
 // Descending so newest years appear first in filter UI
-export const mapYears = Array.from({ length: 2026 - 2017 + 1 }, (_, i) => 2026 - i)
+export const mapYears = defaultMapYears
 
 export const regions = [
   { value: 'all', label: 'Все регионы' },
-  { value: 'krasnodar', label: 'Краснодарский край' },
-  { value: 'spb', label: 'Санкт-Петербург' },
-  { value: 'lenobl', label: 'Ленинградская область' },
-  { value: 'rostov', label: 'Ростовская область' },
-  { value: 'stavropol', label: 'Ставропольский край' },
-  { value: 'other', label: 'Другой регион' },
+  ...defaultMapRegions,
 ]
