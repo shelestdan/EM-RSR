@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
-const SESSION_KEY = 'portal_token'
 const INACTIVITY_LIMIT = 45 * 60 * 1000 // 45 min
+const SESSION_REFRESH_INTERVAL = 5 * 60 * 1000
 
 interface PortalLink {
   id: string
@@ -32,18 +32,31 @@ export default function PortalDashboard() {
   const [loading, setLoading] = useState(true)
   const [lastActivity, setLastActivity] = useState(Date.now())
   const [timeoutWarning, setTimeoutWarning] = useState(false)
+  const lastRefreshRef = useRef(Date.now())
 
   const logout = useCallback(async () => {
     await fetch('/api/portal-login', { method: 'DELETE' })
-    sessionStorage.removeItem(SESSION_KEY)
     router.push('/portal')
   }, [router])
+
+  const refreshSession = useCallback(async () => {
+    const res = await fetch('/api/portal-session', { cache: 'no-store' })
+    if (res.status === 401) {
+      await logout()
+    }
+  }, [logout])
 
   // Activity tracking for 45-min timeout
   useEffect(() => {
     const resetActivity = () => {
-      setLastActivity(Date.now())
+      const now = Date.now()
+      setLastActivity(now)
       setTimeoutWarning(false)
+
+      if (now - lastRefreshRef.current >= SESSION_REFRESH_INTERVAL) {
+        lastRefreshRef.current = now
+        void refreshSession()
+      }
     }
 
     const events = ['mousemove', 'keydown', 'click', 'touchstart', 'scroll']
@@ -62,7 +75,7 @@ export default function PortalDashboard() {
       events.forEach((ev) => window.removeEventListener(ev, resetActivity))
       clearInterval(check)
     }
-  }, [lastActivity, logout])
+  }, [lastActivity, logout, refreshSession])
 
   // Fetch links
   useEffect(() => {

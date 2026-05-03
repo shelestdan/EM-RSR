@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getPortalPayload, setPortalCookie, verifyPortalRequest } from '@/lib/portal-auth'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 export async function GET(req: NextRequest) {
-  // Verify portal session cookie
-  const token = req.cookies.get('portal_session')?.value
-  if (!token) {
+  const session = await verifyPortalRequest(req).catch(() => null)
+  if (!session) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const baseUrl =
-    process.env.PAYLOAD_INTERNAL_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-
-  const res = await fetch(`${baseUrl}/api/portal-links?sort=order&limit=100`, {
-    headers: { Authorization: `JWT ${token}` },
+  const payload = await getPortalPayload()
+  const data = await payload.find({
+    collection: 'portal-links',
+    limit: 100,
+    sort: 'order',
+    overrideAccess: true,
   })
 
-  if (!res.ok) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const data = await res.json()
-  return NextResponse.json(data)
+  const response = NextResponse.json(data)
+  setPortalCookie(response, session.token)
+  return response
 }

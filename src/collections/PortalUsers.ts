@@ -1,5 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
+const isAdmin = ({ req }: { req: { user?: { collection?: string } | null } }) =>
+  req.user?.collection === 'users'
+
 export const PortalUsers: CollectionConfig = {
   slug: 'portal-users',
   auth: {
@@ -19,10 +22,10 @@ export const PortalUsers: CollectionConfig = {
     plural: 'Исполнители',
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
-    create: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {

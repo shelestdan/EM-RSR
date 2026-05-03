@@ -149,4 +149,5 @@ export const regions = [
   { value: 'lenobl', label: 'Ленинградская область' },
   { value: 'rostov', label: 'Ростовская область' },
   { value: 'stavropol', label: 'Ставропольский край' },
+  { value: 'other', label: 'Другой регион' },
 ]

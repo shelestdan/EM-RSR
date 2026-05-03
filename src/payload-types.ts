@@ -315,7 +315,7 @@ export interface Project {
   createdAt: string;
 }
 /**
- * Заготовка будущей админки меток. Сейчас публичная карта берёт данные из staticMarkers, источник — DOCX со ссылками на Yandex constructor.
+ * Метки публичной карты. Добавленные здесь объекты появляются на карте сайта без ручной правки кода.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "map-markers".

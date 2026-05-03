@@ -2,7 +2,7 @@
 
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { mapYears } from '@/lib/site-data'
+import { mapYears, regions } from '@/lib/site-data'
 
 // ─────────────────────────────────────────────────────────────
 // DATA SCHEMA — exported so markers-data.ts stays in sync
@@ -612,26 +612,51 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
 
   const [directionFilters, setDirectionFilters] = useState<string[]>([])
   const [yearFilters, setYearFilters] = useState<number[]>([])
+  const [regionFilters, setRegionFilters] = useState<string[]>([])
+  const [adminMarkers, setAdminMarkers] = useState<MapMarkerData[]>([])
   const [mapReady, setMapReady] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
 
-  const allMarkers = useMemo(() => [...initialMarkers, ...OFFICE_MARKERS], [initialMarkers])
+  const sourceMarkers = useMemo(
+    () => [...initialMarkers, ...adminMarkers],
+    [initialMarkers, adminMarkers],
+  )
+  const allMarkers = useMemo(() => [...sourceMarkers, ...OFFICE_MARKERS], [sourceMarkers])
 
   const filterFn = useMemo(() => {
     return (marker: MapMarkerData) => {
       const cat = categoryOf(marker)
       if (directionFilters.length > 0 && !directionFilters.includes(cat)) return false
       if (yearFilters.length > 0 && !yearFilters.includes(marker.year)) return false
+      if (regionFilters.length > 0 && !regionFilters.includes(marker.region)) return false
       return true
     }
-  }, [directionFilters, yearFilters])
+  }, [directionFilters, yearFilters, regionFilters])
 
   const filteredObjectCount = useMemo(
-    () => initialMarkers.filter(filterFn).length,
-    [filterFn, initialMarkers],
+    () => sourceMarkers.filter(filterFn).length,
+    [filterFn, sourceMarkers],
   )
 
   filterFnRef.current = filterFn
+
+  useEffect(() => {
+    let cancelled = false
+
+    fetch(`${BASE}/api/map-markers`, { cache: 'no-store' })
+      .then((response) => (response.ok ? response.json() : { docs: [] }))
+      .then((data) => {
+        if (cancelled) return
+        setAdminMarkers(Array.isArray(data.docs) ? data.docs : [])
+      })
+      .catch(() => {
+        if (!cancelled) setAdminMarkers([])
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   function toggleDirectionFilter(value: string) {
     setDirectionFilters((current) =>
@@ -649,12 +674,21 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
     )
   }
 
+  function toggleRegionFilter(value: string) {
+    setRegionFilters((current) =>
+      current.includes(value)
+        ? current.filter((item) => item !== value)
+        : [...current, value],
+    )
+  }
+
   function resetFilters() {
     setDirectionFilters([])
     setYearFilters([])
+    setRegionFilters([])
   }
 
-  const hasFilters = directionFilters.length > 0 || yearFilters.length > 0
+  const hasFilters = directionFilters.length > 0 || yearFilters.length > 0 || regionFilters.length > 0
 
   useEffect(() => {
     if (!isFullscreen) return
@@ -854,6 +888,38 @@ export default function YandexMap({ initialMarkers, showFilters = true }: Yandex
               <span className="inline-flex min-w-[54px] items-center justify-center bg-[#3E5854] px-3 py-2 font-brand text-[16px] font-black leading-none text-white tabular-nums">
                 {filteredObjectCount}
               </span>
+            </div>
+
+            {/* Region filter */}
+            <div className="mb-5">
+              <div className="flex flex-wrap gap-1.5">
+                {regions.map((region) => {
+                  const active = region.value === 'all'
+                    ? regionFilters.length === 0
+                    : regionFilters.includes(region.value)
+                  return (
+                    <button
+                      key={region.value}
+                      type="button"
+                      onClick={() => {
+                        if (region.value === 'all') {
+                          setRegionFilters([])
+                          return
+                        }
+                        toggleRegionFilter(region.value)
+                      }}
+                      aria-pressed={active}
+                      className={`border px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#3E5854] ${
+                        active
+                          ? 'border-[#23273F] bg-[#23273F] text-white'
+                          : 'border-[#d9d6cb] bg-white text-[#626675] hover:border-[#3E5854] hover:text-[#23273F]'
+                      }`}
+                    >
+                      {region.label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
 
             {/* Year filter */}

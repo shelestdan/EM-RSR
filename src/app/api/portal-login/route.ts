@@ -1,62 +1,101 @@
 import { NextRequest, NextResponse } from 'next/server'
+import {
+  clearPortalCookie,
+  clearPortalLoginRate,
+  getPortalLoginLock,
+  getPortalPayload,
+  logPortalAccess,
+  PORTAL_LOCK_SECONDS,
+  recordPortalLoginFailure,
+  setPortalCookie,
+  verifyPortalRequest,
+} from '@/lib/portal-auth'
 
 export const dynamic = 'force-dynamic'
-
-const PORTAL_COOKIE = 'portal_session'
+export const runtime = 'nodejs'
 
 // Login
 export async function POST(req: NextRequest) {
-  const { email, password } = await req.json()
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
-  const userAgent = req.headers.get('user-agent') || ''
+  const body = await req.json().catch(() => ({}))
+  const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : ''
+  const password = typeof body.password === 'string' ? body.password : ''
 
-  const baseUrl =
-    process.env.PAYLOAD_INTERNAL_URL || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-
-  // Authenticate against Payload's portal-users collection
-  const res = await fetch(`${baseUrl}/api/portal-users/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-
-  const event = res.ok ? 'login_success' : 'login_failed'
-
-  // Log the attempt
-  await fetch(`${baseUrl}/api/portal-access-log`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userEmail: email, ip, userAgent, event }),
-  }).catch(() => {})
-
-  if (!res.ok) {
-    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
+  if (!email || !password) {
+    await logPortalAccess({ event: 'login_failed', req, userEmail: email })
+    return NextResponse.json({ error: 'Введите логин и пароль' }, { status: 400 })
   }
 
-  const data = await res.json()
-  const token = data.token
+  const lockedFor = getPortalLoginLock(req, email)
+  if (lockedFor > 0) {
+    await logPortalAccess({ event: 'locked_out', req, userEmail: email })
+    return NextResponse.json(
+      { error: 'Доступ временно закрыт', retryAfter: lockedFor },
+      { status: 423 },
+    )
+  }
 
-  const response = NextResponse.json({ ok: true })
-  response.cookies.set(PORTAL_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 45, // 45 min
-    path: '/',
-  })
+  try {
+    const payload = await getPortalPayload()
+    const login = await payload.login({
+      collection: 'portal-users',
+      data: { email, password },
+      overrideAccess: true,
+    })
 
-  return response
+    const user = login.user as { active?: boolean; email?: string; name?: string } | undefined
+    if (!login.token || user?.active === false) {
+      const rate = recordPortalLoginFailure(req, email)
+      await logPortalAccess({ event: 'login_failed', req, userEmail: email })
+      return NextResponse.json(
+        { error: 'Доступ отключён', remaining: rate.remaining, retryAfter: rate.retryAfter },
+        { status: rate.locked ? 423 : 403 },
+      )
+    }
+
+    clearPortalLoginRate(req, email)
+    await logPortalAccess({ event: 'login_success', req, userEmail: user?.email || email })
+
+    const response = NextResponse.json({
+      ok: true,
+      user: {
+        email: user?.email || email,
+        name: user?.name || '',
+      },
+    })
+    setPortalCookie(response, login.token)
+
+    return response
+  } catch (error) {
+    const errorName = error instanceof Error ? error.name : ''
+    const constructorName =
+      typeof error === 'object' && error && 'constructor' in error
+        ? (error.constructor as { name?: string }).name || ''
+        : ''
+    const locked = errorName === 'LockedAuth' || constructorName === 'LockedAuth'
+    const rate = locked
+      ? { locked: true, remaining: 0, retryAfter: PORTAL_LOCK_SECONDS }
+      : recordPortalLoginFailure(req, email)
+    const isLocked = locked || rate.locked
+
+    await logPortalAccess({ event: isLocked ? 'locked_out' : 'login_failed', req, userEmail: email })
+
+    return NextResponse.json(
+      {
+        error: isLocked ? 'Доступ временно закрыт' : 'Неверный логин или пароль',
+        remaining: rate.remaining,
+        retryAfter: rate.retryAfter,
+      },
+      { status: isLocked ? 423 : 401 },
+    )
+  }
 }
 
 // Logout
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
+  const session = await verifyPortalRequest(req).catch(() => null)
+  await logPortalAccess({ event: 'logout', req, userEmail: session?.user.email })
+
   const response = NextResponse.json({ ok: true })
-  response.cookies.set(PORTAL_COOKIE, '', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 0,
-    path: '/',
-  })
+  clearPortalCookie(response)
   return response
 }

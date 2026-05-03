@@ -1,5 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
+const isAdmin = ({ req }: { req: { user?: { collection?: string } | null } }) =>
+  req.user?.collection === 'users'
+
 export const PortalAccessLog: CollectionConfig = {
   slug: 'portal-access-log',
   admin: {
@@ -14,9 +17,9 @@ export const PortalAccessLog: CollectionConfig = {
   },
   access: {
     create: () => true,
-    read: ({ req }) => Boolean(req.user),
+    read: isAdmin,
     update: () => false,
-    delete: ({ req }) => Boolean(req.user),
+    delete: isAdmin,
   },
   fields: [
     {

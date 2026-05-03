@@ -1,5 +1,8 @@
 import type { CollectionConfig } from 'payload'
 
+const isAdmin = ({ req }: { req: { user?: { collection?: string } | null } }) =>
+  req.user?.collection === 'users'
+
 export const MapMarkers: CollectionConfig = {
   slug: 'map-markers',
   admin: {
@@ -7,11 +10,17 @@ export const MapMarkers: CollectionConfig = {
     group: 'Карта объектов',
     defaultColumns: ['title', 'category', 'region', 'year', 'updatedAt'],
     description:
-      'Заготовка будущей админки меток. Сейчас публичная карта берёт данные из staticMarkers, источник — DOCX со ссылками на Yandex constructor.',
+      'Метки публичной карты. Добавленные здесь объекты появляются на карте сайта без ручной правки кода.',
   },
   labels: {
     singular: 'Метка на карте',
     plural: 'Метки на карте',
+  },
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {

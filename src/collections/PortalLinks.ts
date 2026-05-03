@@ -1,5 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
+const isSignedIn = ({ req }: { req: { user?: unknown } }) => Boolean(req.user)
+const isAdmin = ({ req }: { req: { user?: { collection?: string } | null } }) =>
+  req.user?.collection === 'users'
+
 export const PortalLinks: CollectionConfig = {
   slug: 'portal-links',
   admin: {
@@ -13,10 +17,10 @@ export const PortalLinks: CollectionConfig = {
     plural: 'Ссылки',
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
-    create: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user),
+    read: isSignedIn,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {

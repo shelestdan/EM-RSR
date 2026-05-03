@@ -79,6 +79,19 @@ export default function PortalLoginPage() {
         setRateLimitState({ attempts: 0, lockedUntil: 0 })
         router.push('/portal/dashboard')
       } else {
+        const data = await res.json().catch(() => ({}))
+        if (res.status === 423) {
+          const retryAfter =
+            typeof data.retryAfter === 'number' && data.retryAfter > 0
+              ? data.retryAfter * 1000
+              : LOCKOUT_DURATION
+          const lockedUntil = Date.now() + retryAfter
+          setRateLimitState({ attempts: MAX_ATTEMPTS, lockedUntil })
+          setStatus('locked')
+          setLockRemaining(Math.ceil(retryAfter / 1000))
+          return
+        }
+
         const newAttempts = rl.attempts + 1
         if (newAttempts >= MAX_ATTEMPTS) {
           const lockedUntil = Date.now() + LOCKOUT_DURATION
@@ -89,7 +102,7 @@ export default function PortalLoginPage() {
           setRateLimitState({ attempts: newAttempts, lockedUntil: 0 })
           const remaining = MAX_ATTEMPTS - newAttempts
           setErrorMsg(
-            `Неверный логин или пароль. Осталось попыток: ${remaining}`
+            `${typeof data.error === 'string' ? data.error : 'Неверный логин или пароль'}. Осталось попыток: ${remaining}`
           )
           setStatus('error')
         }
